@@ -778,7 +778,7 @@ function partyUsed(kind,id){if(S.data.vouchers.some(v=>v.partyType===kind&&v.par
 function itemUsed(id){return Object.values(DOCS).some(c=>S.data[c.col].some(d=>(d.lines||[]).some(l=>l.itemId===id)))||S.data.counts.some(c=>(c.lines||[]).some(l=>l.itemId===id))}
 
 /* ===================== Supabase (outside Claude) ===================== */
-const SB_CFG={url:'',key:''};
+const SB_CFG={url:'https://jwlhwldrbxsxzqonceru.supabase.co',key:'sb_publishable_blK6iUAiouiTvN6t4YptbA_CZGaqy1i'};
 const SB={client:null,
   async lib(){if(window.supabase&&window.supabase.createClient)return window.supabase;
     await new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});return window.supabase},
