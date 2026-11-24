@@ -606,7 +606,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* ===================== i18n ===================== */
 const L={
 app:['مصدر','Masdar'],tagline:['النظام المحاسبي المتكامل','Integrated Accounting System'],
-loginTitle:['تسجيل الدخول','Sign in'],rememberMe:['تذكّرني على هذا الجهاز','Remember me on this device'],sbTitle:['ربط الجهاز بقاعدة البيانات','Connect this device'],sbSub:['أدخل بريد وكلمة مرور حساب الشركة في Supabase. يُطلب مرة واحدة على كل جهاز.','Enter the company Supabase account email and password. Asked once per device.'],sbEmail:['البريد الإلكتروني','Email'],sbGo:['ربط الجهاز','Connect'],sbWrong:['البريد أو كلمة المرور غير صحيحة','Wrong email or password'],sbNoAccess:['هذا الحساب غير مصرّح له ببيانات مصدر','This account has no access to Masdar data'],sbOut:['فصل هذا الجهاز','Disconnect this device'],rememberHint:['يبقى دخولك محفوظاً حتى تضغط «خروج». لا تفعّله على جهاز مشترك.','You stay signed in until you press Sign out. Avoid on shared devices.'],loginSub:['أدخل بيانات حسابك للمتابعة','Enter your account details to continue'],
+loginTitle:['تسجيل الدخول','Sign in'],rememberMe:['تذكّرني على هذا الجهاز','Remember me on this device'],sbTitle:['ربط الجهاز بقاعدة البيانات','Connect this device'],sbSub:['أدخل بريد وكلمة مرور حساب الشركة في Supabase. يُطلب مرة واحدة على كل جهاز.','Enter the company Supabase account email and password. Asked once per device.'],sbEmail:['البريد الإلكتروني','Email'],sbGo:['ربط الجهاز','Connect'],sbWrong:['البريد أو كلمة المرور غير صحيحة','Wrong email or password'],sbNoAccess:['هذا الحساب غير مصرّح له ببيانات مصدر','This account has no access to Masdar data'],sbOut:['فصل هذا الجهاز','Disconnect this device'],sbNew:['إنشاء حساب الشركة','Create company account'],sbCreated:['تم إنشاء الحساب، وهو بانتظار التفعيل. بعد تفعيله اضغط «ربط الجهاز».','Account created and waiting for activation. Once activated, press Connect.'],sbUnconfirmed:['الحساب لم يُفعَّل بعد','The account is not activated yet'],sbShortPw:['كلمة المرور 8 أحرف على الأقل','Password must be at least 8 characters'],rememberHint:['يبقى دخولك محفوظاً حتى تضغط «خروج». لا تفعّله على جهاز مشترك.','You stay signed in until you press Sign out. Avoid on shared devices.'],loginSub:['أدخل بيانات حسابك للمتابعة','Enter your account details to continue'],
 username:['اسم المستخدم','Username'],password:['كلمة المرور','Password'],signIn:['دخول','Sign in'],loadingData:['جارٍ تحميل البيانات…','Loading data…'],
 wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيحة','Wrong username or password'],defaultHint:['أول دخول: اسم المستخدم admin وكلمة المرور admin — غيّرها من الإعدادات.','First sign-in: username admin, password admin — change it in Settings.'],
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
@@ -995,6 +995,7 @@ function sbLoginHtml(){
    <label class="fld"><span>${t('password')}</span><input id="sp" type="password" autocomplete="current-password" required></label>
    <div class="err" id="serr"></div>
    <button class="btn primary" id="sbtn">${t('sbGo')}</button>
+   <button type="button" class="btn" id="sbNew">${t('sbNew')}</button>
   </form></div>`;
 }
 function loginHtml(){
@@ -1018,9 +1019,18 @@ function loginHtml(){
 }
 function bindLogin(){
   const sf=$('#sbForm');
-  if(sf){sf.addEventListener('submit',async e=>{e.preventDefault();const b=$('#sbtn');b.disabled=true;$('#serr').textContent='';
+  if(sf){$('#sbNew').onclick=async()=>{const e1=$('#se').value.trim(),p1=$('#sp').value,er=$('#serr'),nb=$('#sbNew');er.textContent='';er.style.color='';
+      if(!e1||!$('#se').checkValidity()){$('#se').reportValidity();return}
+      if(p1.length<8){er.textContent=t('sbShortPw');return}
+      nb.disabled=true;
+      try{const c=await SB.get();const {data,error}=await c.auth.signUp({email:e1,password:p1,options:{emailRedirectTo:location.origin+location.pathname}});
+        if(error){er.textContent=error.message||t('saveFailed');nb.disabled=false;return}
+        if(data&&data.session){Store.db=null;Store.subscribed=false;await Store.init();loadSession();render();return}
+        er.style.color='var(--ok, #1a7f4b)';er.textContent=t('sbCreated');nb.disabled=false;
+      }catch(err){er.textContent=t('cloudFail');nb.disabled=false}};
+    sf.addEventListener('submit',async e=>{e.preventDefault();const b=$('#sbtn');b.disabled=true;$('#serr').textContent='';
     try{const c=await SB.get();const {error}=await c.auth.signInWithPassword({email:$('#se').value.trim(),password:$('#sp').value});
-      if(error){$('#serr').textContent=t('sbWrong');b.disabled=false;return}
+      if(error){$('#serr').textContent=(error.code==='email_not_confirmed'||/not confirmed/i.test(error.message||''))?t('sbUnconfirmed'):t('sbWrong');b.disabled=false;return}
       Store.db=null;Store.subscribed=false;await Store.init();
       if(S.mode==='nocloud'){$('#serr')&&($('#serr').textContent=t('sbNoAccess'))}
       loadSession();if(S.user&&S.user.isDefault&&(settings().users||[]).length)S.user=null;render();
