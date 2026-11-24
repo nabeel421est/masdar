@@ -156,6 +156,8 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .pm-cash.on{background:var(--g-em)}
 .pm-benefit.on{background:linear-gradient(135deg,#a3172f,#d8314c)}
 .pm-credit.on{background:var(--g-gold);color:#2a1f05}
+.dash-acts{flex-wrap:wrap;gap:8px}
+@media(max-width:520px){.dash-acts{width:100%}.dash-acts .btn{flex:1 1 calc(50% - 8px);justify-content:center}.dash-acts .btn.primary{flex-basis:100%}}
 .pm-transfer.on{background:linear-gradient(135deg,#0f6e8c,#1c97b8)}
 .paym-opts.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:520px){.paym-opts.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -621,7 +623,7 @@ wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيح�
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
 logout:['خروج','Sign out'],hello:['مرحباً','Welcome'],hideMenu:['إخفاء القائمة','Hide menu'],showMenu:['إظهار القائمة','Show menu'],lang:['English','العربية'],
 dashboard:['لوحة التحكم','Dashboard'],accounts:['الحسابات','Accounts'],inventory:['المخزون','Inventory'],sales:['المبيعات','Sales'],purchases:['المشتريات','Purchases'],settings:['الإعدادات','Settings'],
-statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
+statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
 custBalances:['أرصدة العملاء','Customer balances'],suppBalances:['أرصدة الموردين','Supplier balances'],
 items:['قائمة الأصناف','Items list'],itemForm:['إضافة صنف جديد','Add new item'],stockCount:['جرد المخزون','Stock count'],
 'doc-sale':['إضافة فاتورة مبيعات','New sales invoice'],'list-sale':['تقرير المبيعات','Sales report'],
@@ -1209,7 +1211,7 @@ PAGES.dashboard={html(){
     const cfg=DOCS[r.type];return `<tr class="click" data-act="openDoc" data-type="${r.type}" data-id="${r.d.id}"><td><span class="tag">${t('doc_'+r.type)}</span></td><td>${docNo(r.type,r.d)}</td><td>${h(r.d.date)}</td><td>${h(partyName(cfg.party,r.d))}</td><td class="n">${cfg.money?fmt(docTotals(r.d).total):fq((r.d.lines||[]).reduce((s,l)=>s+(+l.qty||0),0))}</td></tr>`}).join('');
   const q=(k,icn)=>`<button class="btn" data-go="${k}">${ic(icn)}${t(k)}</button>`;
   const dstr=new Date().toLocaleDateString(isAr()?'ar-u-nu-latn':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  return `<div class="pg-head"><div><h2>${t('hello')}${isAr()?'، ':', '}${h(S.user.name)}</h2><p>${h(dstr)} · ${h(coName())}</p></div><div class="row"><button class="btn hide-sm" data-go="doc-purchase">${ic('truck')}${t('doc-purchase')}</button><button class="btn primary" data-go="doc-sale">${ic('plus')}${t('doc-sale')}</button></div></div>
+  return `<div class="pg-head"><div><h2>${t('hello')}${isAr()?'، ':', '}${h(S.user.name)}</h2><p>${h(dstr)} · ${h(coName())}</p></div><div class="row dash-acts">${canSee('doc-sale')?`<button class="btn primary" data-go="doc-sale">${ic('plus')}${t('doc-sale')}</button>`:''}${canSee('doc-purchase')?`<button class="btn" data-go="doc-purchase">${ic('truck')}${t('doc-purchase')}</button>`:''}${canSee('payment')?`<button class="btn" data-go="payment">${ic('wallet')}${t('addPayment')}</button>`:''}</div></div>
   ${S.user.isDefault?`<div class="alert">${ic('alert')}${t('changeDefault')} <a data-go="settings" style="cursor:pointer;font-weight:700">${t('settings')}</a></div>`:''}
   ${S.mode==='local'?`<div class="alert info">${ic('alert')}${t('localNote')}</div>`:''}
   ${backupAlert()}
