@@ -627,7 +627,7 @@ doc_sale:['فاتورة مبيعات','Sales invoice'],doc_issue:['إذن صرف
 no:['الرقم','No.'],date:['التاريخ','Date'],customer:['العميل','Customer'],supplier:['المورد','Supplier'],party:['الطرف','Party'],recipient:['المستلم','Recipient'],
 cashCustomer:['— عميل نقدي —','— Cash customer —'],cashSupplier:['— مورد نقدي —','— Cash supplier —'],otherParty:['— جهة أخرى —','— Other —'],
 nameOptional:['الاسم (اختياري)','Name (optional)'],item:['الصنف','Item'],unit:['الوحدة','Unit'],qty:['الكمية','Qty'],price:['السعر','Price'],total:['الإجمالي','Total'],
-addLine:['إضافة سطر','Add line'],translating:['جارٍ الترجمة…','Translating…'],translated:['تُرجم تلقائياً — يمكنك تعديله','Translated automatically — you can edit it'],trFailed:['تعذّرت الترجمة — اكتب الاسم العربي أو اضغط «ترجمة الآن»','Translation failed — type the Arabic name or press “Translate now”'],trUnavailable:['الترجمة التلقائية غير متاحة هنا — اكتب الاسم العربي يدوياً','Automatic translation isn’t available here — type the Arabic name'],translateNow:['ترجمة الآن','Translate now'],trHint:['يُترجم إلى العربية تلقائياً عند الانتقال من الحقل','Translated to Arabic automatically when you leave the field'],trBusy:['حاول بعد قليل — طلبات ترجمة كثيرة','Try again shortly — too many translation requests'],noLinesYet:['لم تُضف أصناف بعد — ابحث عن الصنف في الحقل أعلاه واختره','No items yet — search for an item above and pick it'],searchItem:['ابحث عن صنف بالاسم أو الكود ثم اضغط Enter…','Search items by name or code, then press Enter…'],noResults:['لا توجد أصناف مطابقة','No matching items'],added:['أُضيف','Added'],subtotal:['المجموع','Subtotal'],discount:['الخصم','Discount'],taxPct:['الضريبة %','Tax %'],tax:['الضريبة','Tax'],grand:['الإجمالي النهائي','Grand total'],
+addLine:['إضافة سطر','Add line'],translating:['جارٍ الترجمة…','Translating…'],translated:['تُرجم تلقائياً — يمكنك تعديله','Translated automatically — you can edit it'],trFailed:['تعذّرت الترجمة — اكتب الاسم يدوياً أو اضغط «ترجمة الآن»','Translation failed — type the name yourself or press “Translate now”'],trUnavailable:['الترجمة التلقائية غير متاحة هنا — اكتب الاسم العربي يدوياً','Automatic translation isn’t available here — type the Arabic name'],translateNow:['ترجمة الآن','Translate now'],trHint:['اكتب الاسم بالعربي أو بالإنجليزي، ويُترجم الحقل الآخر تلقائياً','Type the name in Arabic or English and the other field fills in automatically'],trBusy:['حاول بعد قليل — طلبات ترجمة كثيرة','Try again shortly — too many translation requests'],noLinesYet:['لم تُضف أصناف بعد — ابحث عن الصنف في الحقل أعلاه واختره','No items yet — search for an item above and pick it'],searchItem:['ابحث عن صنف بالاسم أو الكود ثم اضغط Enter…','Search items by name or code, then press Enter…'],noResults:['لا توجد أصناف مطابقة','No matching items'],added:['أُضيف','Added'],subtotal:['المجموع','Subtotal'],discount:['الخصم','Discount'],taxPct:['الضريبة %','Tax %'],tax:['الضريبة','Tax'],grand:['الإجمالي النهائي','Grand total'],
 paid:['المدفوع','Paid'],refunded:['المبلغ المسترد','Refunded'],remaining:['المتبقي (آجل)','Remaining (credit)'],payFull:['دفع كامل','Pay in full'],
 notes:['ملاحظات','Notes'],ref:['رقم الفاتورة الأصلية','Original invoice no.'],save:['حفظ','Save'],savePrint:['حفظ وطباعة PDF','Save & PDF'],cancel:['إلغاء','Cancel'],confirm:['تأكيد','Confirm'],
 edit:['تعديل','Edit'],del:['حذف','Delete'],view:['عرض','View'],close:['إغلاق','Close'],search:['بحث…','Search…'],from:['من','From'],to:['إلى','To'],all:['الكل','All'],
@@ -1543,7 +1543,7 @@ PAGES.itemForm={html(){
   <datalist id="unitsDl">${unitList}</datalist>
   ${sec('s-em','tag',t('itemData'),`<div class="grid g3">
     ${fld(t('code'),`<div class="code-box"><input readonly dir="ltr" value="${h(d.code)}">${d.id?'':`<button type="button" class="btn icon" data-act="newCode" title="${t('newCode')}">↻</button>`}</div><span class="small muted">${t('autoCode')}</span>`)}
-    ${fld(t('nameEn'),`<input data-it="nameEn" dir="ltr" value="${h(d.nameEn)}" enterkeyhint="next" autocapitalize="words" placeholder="Cucumber"><div class="small muted">${t('trHint')} · <a data-act="translateNow" style="cursor:pointer;font-weight:600">${t('translateNow')}</a></div>`)}
+    ${fld(t('nameEn'),`<input data-it="nameEn" dir="ltr" value="${h(d.nameEn)}" enterkeyhint="next" autocapitalize="words" placeholder="Cucumber"><div class="small tr-status" id="trStatusEn">${d._trMsgEn||''}</div><div class="small muted">${t('trHint')} · <a data-act="translateNow" style="cursor:pointer;font-weight:600">${t('translateNow')}</a></div>`)}
     ${fld(t('nameAr'),`<input data-it="name" dir="rtl" value="${h(d.name)}" placeholder="${isAr()?'خيار':'Arabic name'}"><div class="small tr-status" id="trStatus">${d._trMsg||''}</div>`,1)}
   </div>`)}
   ${sec('s-gold','layers',t('unitsPrices'),`
@@ -1579,30 +1579,46 @@ function itemPreviewHtml(d){
 function paintItemPreview(){const el=$('#ipv');if(el&&S.itemDraft)el.innerHTML=itemPreviewHtml(S.itemDraft);const mc=$('#marginChip');if(mc&&S.itemDraft)mc.innerHTML=marginTxt(S.itemDraft.price,S.itemDraft.cost)}
 let samP=null,trCtl=null;
 function getSample(){if(!samP)samP=(window.claude&&typeof window.claude.use==='function')?Promise.resolve(window.claude.use('sample')).catch(()=>null):Promise.resolve(null);return samP}
-function trSet(d,msg,cls){d._trMsg=msg?`<span class="${cls||''}">${h(msg)}</span>`:'';const st=$('#trStatus');if(st&&S.itemDraft===d)st.innerHTML=d._trMsg}
-async function autoTranslate(force){
-  const d=S.itemDraft;if(!d)return;const en=String(d.nameEn||'').trim();if(!en||!/[A-Za-z]/.test(en))return;
-  const ar=String(d.name||'').trim();
-  if(!force){if(ar&&ar!==d._autoAr)return;if(ar&&en===d._lastEn)return}
-  const sample=await getSample();if(!sample){trSet(d,t('trUnavailable'),'muted');return}
-  if(trCtl)trCtl.abort();const ctl=trCtl=new AbortController();trSet(d,t('translating'),'muted');
-  const prompt='Translate this shop item name from English to Arabic, the way a grocery or trading shop in Bahrain would write it on an invoice. '
-    +'Keep brand names recognisable (write them in Arabic letters), keep numbers, sizes and units (330ml → 330 مل, 5kg → 5 كغ, pcs → حبة). '
-    +'Reply with only the Arabic item name on one line — no quotes, no explanation.\n\nItem name: '+en;
+function trSet(d,msg,cls,which){const k=which==='en'?'_trMsgEn':'_trMsg';d[k]=msg?`<span class="${cls||''}">${h(msg)}</span>`:'';const st=$(which==='en'?'#trStatusEn':'#trStatus');if(st&&S.itemDraft===d)st.innerHTML=d[k]}
+const TR_DIR={en2ar:{src:'nameEn',dst:'name',from:'en',to:'ar',re:/[A-Za-z]/,auto:'_autoAr',last:'_lastEn',which:'ar',lang:'Arabic',ex:'330ml → 330 مل, 5kg → 5 كغ, pcs → حبة'},
+  ar2en:{src:'name',dst:'nameEn',from:'ar',to:'en',re:/[؀-ۿ]/,auto:'_autoEn',last:'_lastAr',which:'en',lang:'English',ex:'330 مل → 330ml, 5 كغ → 5kg, حبة → pcs'}};
+async function webTranslate(text,from,to,signal){
+  try{const r=await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl='+from+'&tl='+to+'&q='+encodeURIComponent(text),{signal});
+    if(r.ok){const j=await r.json();const o=(j&&j[0]||[]).map(x=>x&&x[0]||'').join('').trim();if(o)return o}}catch(e){if(e&&e.name==='AbortError')throw {code:'cancelled'}}
+  try{const r=await fetch('https://api.mymemory.translated.net/get?langpair='+from+'|'+to+'&q='+encodeURIComponent(text),{signal});
+    if(r.ok){const j=await r.json();const o=String(j&&j.responseData&&j.responseData.translatedText||'').trim();if(o&&!/MYMEMORY WARNING|INVALID/i.test(o))return o}}catch(e){if(e&&e.name==='AbortError')throw {code:'cancelled'}}
+  throw {code:'web_failed'};
+}
+async function autoTranslate(force,dirKey){
+  const d=S.itemDraft;if(!d)return;
+  dirKey=dirKey||d._trSrc||'en2ar';const D=TR_DIR[dirKey];
+  const src=String(d[D.src]||'').trim();if(!src||!D.re.test(src))return;
+  const dst=String(d[D.dst]||'').trim();
+  if(!force){if(dst&&dst!==d[D.auto])return;if(dst&&src===d[D.last])return}
+  if(trCtl)trCtl.abort();const ctl=trCtl=new AbortController();trSet(d,t('translating'),'muted',D.which);
   try{
-    const {text}=await sample(prompt,{modelTier:'quick',signal:ctl.signal,cache:{gcTime:86400000}});
+    let out;const sample=await getSample();
+    if(sample){const prompt='Translate this shop item name from '+(D.from==='en'?'English to Arabic':'Arabic to English')+', the way a grocery or trading shop in Bahrain would write it on an invoice. '
+        +'Keep brand names recognisable, keep numbers, sizes and units ('+D.ex+'). '
+        +'Reply with only the '+D.lang+' item name on one line — no quotes, no explanation.\n\nItem name: '+src;
+      const {text}=await sample(prompt,{modelTier:'quick',signal:ctl.signal,cache:{gcTime:86400000}});out=text}
+    else out=await webTranslate(src,D.from,D.to,ctl.signal);
     if(ctl!==trCtl||S.itemDraft!==d)return;
-    const out=String(text).trim().split('\n')[0].replace(/^["'«“»\s]+|["'»”«\s.]+$/g,'').trim();
+    out=String(out).trim().split('\n')[0].replace(/^["'«“»\s]+|["'»”«\s.]+$/g,'').trim();
+    if(D.to==='en')out=out.replace(/\b([a-z])/g,c=>c.toUpperCase());
     if(!out)throw {code:'empty_completion'};
-    const cur=String(d.name||'').trim();if(!force&&cur&&cur!==d._autoAr){trSet(d,'');return}
-    d.name=out;d._autoAr=out;d._lastEn=en;paintItemPreview();
-    const inp=$('[data-it="name"]');if(inp){inp.value=out;inp.classList.add('tr-flash');setTimeout(()=>inp.classList.remove('tr-flash'),1200)}
-    trSet(d,'✓ '+t('translated'),'pos');
+    if(String(d[D.src]||'').trim()!==src)return;
+    const cur=String(d[D.dst]||'').trim();if(!force&&cur&&cur!==d[D.auto]){trSet(d,'','',D.which);return}
+    d[D.dst]=out;d[D.auto]=out;d[D.last]=src;paintItemPreview();
+    const inp=$(`[data-it="${D.dst}"]`);if(inp&&document.activeElement!==inp){inp.value=out;inp.classList.add('tr-flash');setTimeout(()=>inp.classList.remove('tr-flash'),1200)}
+    trSet(d,'✓ '+t('translated'),'pos',D.which);
   }catch(e){
     if(e&&e.code==='cancelled')return;
-    const c=e&&e.code;trSet(d,(c==='not_granted'||c==='sampling_disabled'||c==='not_declared'||c==='capability_disabled'||c==='capability_removed')?t('trUnavailable'):c==='rate_limited'?t('trBusy'):t('trFailed'),c==='rate_limited'?'muted':'neg');
+    const c=e&&e.code;trSet(d,c==='rate_limited'?t('trBusy'):t('trFailed'),c==='rate_limited'?'muted':'neg',D.which);
   }
 }
+let trT=null;
+function scheduleTranslate(field){const d=S.itemDraft;if(!d)return;const dir=field==='name'?'ar2en':'en2ar';d._trSrc=dir;clearTimeout(trT);trT=setTimeout(()=>autoTranslate(false,dir),650)}
 function itemMoves(id){const M=[];
   for(const [type,cfg] of Object.entries(DOCS))for(const d of S.data[cfg.col])(d.lines||[]).forEach(l=>{if(l.itemId!==id)return;M.push({date:d.date,ts:d.createdAt||0,type,id:d.id,ref:docNo(type,d),label:t('doc_'+type),party:partyName(cfg.party,d),qty:cfg.stock*(+l.qty||0)*(+l.factor||1),uq:+l.qty||0,unit:l.unit,price:+l.price||0})});
   for(const c of S.data.counts)(c.lines||[]).forEach(l=>{if(l.itemId===id)M.push({date:c.date,ts:c.createdAt||0,cnt:c.id,ref:'CNT-'+pad(c.no),label:t('countAdj'),party:'',qty:+l.diff||0})});
@@ -2000,7 +2016,7 @@ document.addEventListener('input',e=>{
   if(el.id==='itemSearch'){S.isIdx=0;renderItemRes();return}
   if(ds.f==='taxOn'&&S.draft){S.draft.taxOn=el.checked;render();return}
   if(ds.f&&S.draft){if(ds.f==='partyId')return;S.draft[ds.f]=el.value;S.dirty=true;updateDocTotals();return}
-  if(ds.it&&S.itemDraft){if(el.type==='checkbox'){S.itemDraft[ds.it]=el.checked;render();return}S.itemDraft[ds.it]=el.value;S.dirty=true;paintItemPreview();if(ds.it==='unit')$$('.inp-suf em').forEach(e=>{if(!/%/.test(e.textContent))e.textContent=el.value});return}
+  if(ds.it&&S.itemDraft){if(el.type==='checkbox'){S.itemDraft[ds.it]=el.checked;render();return}S.itemDraft[ds.it]=el.value;S.dirty=true;paintItemPreview();if(ds.it==='name'||ds.it==='nameEn')scheduleTranslate(ds.it);if(ds.it==='unit')$$('.inp-suf em').forEach(e=>{if(!/%/.test(e.textContent))e.textContent=el.value});return}
   if(ds.iu&&S.itemDraft){const [i,f]=ds.iu.split(':');S.itemDraft.units[+i][f]=el.value;S.dirty=true;paintItemPreview();return}
   if(ds.l&&S.draft){const [i,f]=ds.l.split(':');if(f==='itemId'||f==='unit')return;S.draft.lines[+i][f]=el.value;S.dirty=true;updateDocTotals();return}
   if(ds.v&&S.vdraft){if(ds.v==='partyType'||ds.v==='partyId')return;S.vdraft[ds.v]=el.value;S.dirty=true;return}
@@ -2012,7 +2028,7 @@ document.addEventListener('input',e=>{
 let fT=null;
 document.addEventListener('change',e=>{
   const el=e.target;const ds=el.dataset;
-  if(ds.it==='nameEn'&&S.itemDraft){S.itemDraft.nameEn=el.value;autoTranslate(false);return}
+  if((ds.it==='nameEn'||ds.it==='name')&&S.itemDraft){S.itemDraft[ds.it]=el.value;clearTimeout(trT);S.itemDraft._trSrc=ds.it==='name'?'ar2en':'en2ar';autoTranslate(false,S.itemDraft._trSrc);return}
   if(ds.f==='partyId'&&S.draft){S.draft.partyId=el.value;render();return}
   if(ds.l&&S.draft){const [i,f]=ds.l.split(':');if(f==='unit'){const ln=S.draft.lines[+i];const it=byId('items',ln.itemId);const u=it&&itemUnits(it).find(x=>x.name===el.value);if(u){ln.unit=u.name;ln.factor=u.factor;if(DOCS[S.draft.type].money)ln.price=DOCS[S.draft.type].priceKey==='price'?u.price:u.cost}render();return}
     if(f==='itemId'){const ln=S.draft.lines[+i];ln.itemId=el.value;const it=byId('items',el.value);const cfg=DOCS[S.draft.type];ln.unit=it?it.unit:'';ln.factor=1;if(it)Object.assign(ln,taxSnap(it));if(it&&cfg.money)ln.price=+it[cfg.priceKey]||0;
