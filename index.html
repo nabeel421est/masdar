@@ -1244,13 +1244,13 @@ PAGES.doc={html(){
     ${!d.partyId?fld(t('nameOptional'),`<input data-f="partyName" value="${h(d.partyName)}">`):(type==='salesReturn'||type==='purchaseReturn'?fld(t('ref'),`<input data-f="ref" value="${h(d.ref)}">`):fld(t('phone'),`<input readonly dir="ltr" value="${h((byId(partyCol(cfg.party),d.partyId)||{}).phone||'')}">`))}
   </div>
   ${!d.partyId&&(type==='salesReturn'||type==='purchaseReturn')?`<div class="grid g4" style="margin-top:14px">${fld(t('ref'),`<input data-f="ref" value="${h(d.ref)}">`)}</div>`:''}
-  ${type==='salesReturn'||type==='purchaseReturn'?srcPickerHtml(d):''}
-  ${hasPM(type)?`<div class="paym ${S.payErr&&!d.payMethod?'err':''}" id="payBox"><div class="paym-lbl">${t('payMethod')} <span class="neg">*</span></div><div class="paym-opts ${pmList(type).length>3?'four':''}">${pmList(type).map(m=>`<button type="button" class="pm pm-${m} ${d.payMethod===m?'on':''}" data-act="setPay" data-m="${m}">${ic(PM_IC[m])}<span>${t('pm_'+m)}</span></button>`).join('')}</div>
-   ${d.payMethod==='credit'&&!d.partyId?`<div class="alert" style="margin:10px 0 0">${ic('alert')}${t(type==='purchase'?'creditNeedsSupplier':'creditNeedsCustomer')}</div>`:''}</div>`:''}`)}
+  ${type==='salesReturn'||type==='purchaseReturn'?srcPickerHtml(d):''}`)}
   ${sec('cart',t('lines'),`<div class="isearch"><div class="isearch-box">${ic('search')}<input id="itemSearch" autocomplete="off" placeholder="${t('searchItem')}" enterkeyhint="search"></div><div class="isearch-res hidden" id="itemRes"></div></div>
   ${d.lines.length?`<div class="tbl-wrap"><table class="t lines-t"><thead><tr><th>#</th><th>${t('item')}</th><th>${t('unit')}</th><th>${t('qty')}</th>${cfg.money?`<th>${t('price')}</th><th class="n">${t('total')}</th>`:''}<th></th></tr></thead><tbody>${lines}</tbody></table></div>`
    :`<div class="empty lines-empty">${ic('search')}<div>${items.length?t('noLinesYet'):`${t('noData')} — <a data-go="itemForm" style="cursor:pointer">${t('itemForm')}</a>`}</div></div>`}`,`<span class="lines-count" id="linesCount">${d.lines.length}</span>`)}
-  ${sec('wallet',cfg.money?t('totalsSec'):t('notes'),`<div class="grid ${cfg.money?'g2':''}" style="align-items:start">
+  ${sec('wallet',cfg.money?t('totalsSec'):t('notes'),`${hasPM(type)?`<div class="paym ${S.payErr&&!d.payMethod?'err':''}" id="payBox" style="margin:0 0 16px"><div class="paym-lbl">${t('payMethod')} <span class="neg">*</span></div><div class="paym-opts ${pmList(type).length>3?'four':''}">${pmList(type).map(m=>`<button type="button" class="pm pm-${m} ${d.payMethod===m?'on':''}" data-act="setPay" data-m="${m}">${ic(PM_IC[m])}<span>${t('pm_'+m)}</span></button>`).join('')}</div>
+   ${d.payMethod==='credit'&&!d.partyId?`<div class="alert" style="margin:10px 0 0">${ic('alert')}${t(type==='purchase'?'creditNeedsSupplier':'creditNeedsCustomer')}</div>`:''}</div>`:''}
+  <div class="grid ${cfg.money?'g2':''}" style="align-items:start">
     ${fld(t('notes'),`<textarea data-f="notes" placeholder="${t('notesPh')}">${h(d.notes)}</textarea>`)}
     ${cfg.money?`<div class="totals">
       <div class="ln"><span>${t('subNet')}</span><b id="tSub">${fmt(T.sub)}</b></div>
