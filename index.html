@@ -606,7 +606,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* ===================== i18n ===================== */
 const L={
 app:['مصدر','Masdar'],tagline:['النظام المحاسبي المتكامل','Integrated Accounting System'],
-loginTitle:['تسجيل الدخول','Sign in'],rememberMe:['تذكّرني على هذا الجهاز','Remember me on this device'],rememberHint:['يبقى دخولك محفوظاً حتى تضغط «خروج». لا تفعّله على جهاز مشترك.','You stay signed in until you press Sign out. Avoid on shared devices.'],loginSub:['أدخل بيانات حسابك للمتابعة','Enter your account details to continue'],
+loginTitle:['تسجيل الدخول','Sign in'],rememberMe:['تذكّرني على هذا الجهاز','Remember me on this device'],sbTitle:['ربط الجهاز بقاعدة البيانات','Connect this device'],sbSub:['أدخل بريد وكلمة مرور حساب الشركة في Supabase. يُطلب مرة واحدة على كل جهاز.','Enter the company Supabase account email and password. Asked once per device.'],sbEmail:['البريد الإلكتروني','Email'],sbGo:['ربط الجهاز','Connect'],sbWrong:['البريد أو كلمة المرور غير صحيحة','Wrong email or password'],sbNoAccess:['هذا الحساب غير مصرّح له ببيانات مصدر','This account has no access to Masdar data'],sbOut:['فصل هذا الجهاز','Disconnect this device'],rememberHint:['يبقى دخولك محفوظاً حتى تضغط «خروج». لا تفعّله على جهاز مشترك.','You stay signed in until you press Sign out. Avoid on shared devices.'],loginSub:['أدخل بيانات حسابك للمتابعة','Enter your account details to continue'],
 username:['اسم المستخدم','Username'],password:['كلمة المرور','Password'],signIn:['دخول','Sign in'],loadingData:['جارٍ تحميل البيانات…','Loading data…'],
 wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيحة','Wrong username or password'],defaultHint:['أول دخول: اسم المستخدم admin وكلمة المرور admin — غيّرها من الإعدادات.','First sign-in: username admin, password admin — change it in Settings.'],
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
@@ -777,6 +777,33 @@ function cashBalance(){
 function partyUsed(kind,id){if(S.data.vouchers.some(v=>v.partyType===kind&&v.partyId===id))return true;return Object.values(DOCS).some(c=>c.party===kind&&S.data[c.col].some(d=>d.partyId===id))}
 function itemUsed(id){return Object.values(DOCS).some(c=>S.data[c.col].some(d=>(d.lines||[]).some(l=>l.itemId===id)))||S.data.counts.some(c=>(c.lines||[]).some(l=>l.itemId===id))}
 
+/* ===================== Supabase (outside Claude) ===================== */
+const SB_CFG={url:'',key:''};
+const SB={client:null,
+  async lib(){if(window.supabase&&window.supabase.createClient)return window.supabase;
+    await new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)});return window.supabase},
+  async get(){if(this.client)return this.client;const L=await this.lib();this.client=L.createClient(SB_CFG.url,SB_CFG.key,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'masdar-sb-auth'}});return this.client},
+  makeDb(c){
+    const subs={},cache={};COLS.forEach(k=>cache[k]=new Map());let started=false;
+    const emit=col=>{const f=subs[col];if(f)f.cb({docs:[...cache[col].entries()].map(([id,d])=>({id,data:()=>d}))})};
+    const fail=()=>COLS.forEach(k=>subs[k]&&subs[k].err&&subs[k].err({code:'revoked'}));
+    const start=async()=>{started=true;
+      c.channel('masdar-docs').on('postgres_changes',{event:'*',schema:'public',table:'masdar_docs'},p=>{
+        const r=(p.new&&p.new.col)?p.new:p.old;if(!r||!cache[r.col])return;
+        if(p.eventType==='DELETE')cache[r.col].delete(r.id);else cache[r.col].set(r.id,r.data);emit(r.col)}).subscribe();
+      try{let from=0;const step=1000;
+        for(;;){const {data,error}=await c.from('masdar_docs').select('col,id,data').order('col').order('id').range(from,from+step-1);if(error)throw error;
+          data.forEach(r=>cache[r.col]&&cache[r.col].set(r.id,r.data));if(data.length<step)break;from+=step}
+        COLS.forEach(emit)}catch(e){console.warn('supabase load',e);fail()}};
+    const err=e=>({code:(!navigator.onLine||/fetch|network/i.test((e&&e.message)||''))?'unavailable':'invalid_argument',message:e&&e.message});
+    return {collection(col){return {
+      onSnapshot(cb,onErr){subs[col]={cb,err:onErr};if(!started)setTimeout(()=>{if(!started)start()},0)},
+      doc(id){return {
+        async set(rec){const {error}=await c.from('masdar_docs').upsert({col,id,data:rec,updated_at:new Date().toISOString()});if(error)throw err(error);cache[col].set(id,rec)},
+        async delete(){const {error}=await c.from('masdar_docs').delete().eq('col',col).eq('id',id);if(error)throw err(error);cache[col].delete(id)}
+      }}}}};
+  }
+};
 /* ===================== storage ===================== */
 const Store={
   db:null,subscribed:false,
@@ -785,11 +812,12 @@ const Store={
   persistLocal(){try{localStorage.setItem('masdar-data-v1',JSON.stringify(S.data))}catch(e){}},
   async init(){
     S.ready=false;S.localCache=this.readLocal();
-    const api=window.claude;
-    if(!(api&&typeof api.use==='function')){this.loadLocal();S.mode='local';S.ready=true;return}
+    const api=window.claude;const inClaude=!!(api&&typeof api.use==='function');
+    if(!inClaude&&!SB_CFG.url){this.loadLocal();S.mode='local';S.ready=true;return}
     S.mode='connecting';
     let db=this.db;
-    if(!db){try{db=await Promise.race([api.use('db'),new Promise(r=>setTimeout(()=>r(null),15000))])}catch(e){db=null}}
+    if(!db){if(inClaude){try{db=await Promise.race([api.use('db'),new Promise(r=>setTimeout(()=>r(null),15000))])}catch(e){db=null}}
+      else{try{const c=await SB.get();const {data}=await c.auth.getSession();if(!data||!data.session){S.mode='sbauth';return}db=SB.makeDb(c)}catch(e){db=null}}}
     if(!db){S.mode='nocloud';return}
     this.db=db;S.mode='cloud';
     if(!this.subscribed){this.subscribed=true;COLS.forEach(c=>S.data[c]=[]);
@@ -930,7 +958,7 @@ function render(){
   document.title=t('app')+' — '+t('tagline');
   const app=$('#app');
   if(S.user&&!S.user.isDefault&&S.ready){const su=(settings().users||[]).find(x=>x.u===S.user.u);if(!su){S.user=null;saveSession()}else if(su.role!==S.user.role||(su.name&&su.name!==S.user.name)){S.user=Object.assign({},S.user,{role:su.role||'staff',name:su.name||S.user.name});saveSession()}}
-  if(!S.user){app.innerHTML=loginHtml();bindLogin();return}
+  if(!S.user||S.mode==='sbauth'){app.innerHTML=loginHtml();bindLogin();return}
   if(!canSee(navKey())){S.route='dashboard';S.param=null}
   const P=PAGES[S.route]||PAGES.dashboard;
   let body='';try{body=P.html()}catch(e){console.error(e);body=`<div class="card">${h(e.message)}</div>`}
@@ -959,8 +987,19 @@ function shellHtml(body){
     <button class="btn sm" data-act="logout">${ic('out')}<span class="hide-sm">${t('logout')}</span></button>
   </header><main class="main ${pageTheme()?'docpage dt-'+pageTheme():''}" id="main">${body}</main></div></div>`;
 }
+function sbLoginHtml(){
+  return `<div class="login-side"><form class="login-card" id="sbForm" autocomplete="on">
+   <div class="between"><h2>${t('sbTitle')}</h2><button type="button" class="btn sm" data-act="lang">${ic('globe')}${t('lang')}</button></div>
+   <div class="sub">${t('sbSub')}</div>
+   <label class="fld"><span>${t('sbEmail')}</span><input id="se" type="email" autocomplete="email" dir="ltr" required></label>
+   <label class="fld"><span>${t('password')}</span><input id="sp" type="password" autocomplete="current-password" required></label>
+   <div class="err" id="serr"></div>
+   <button class="btn primary" id="sbtn">${t('sbGo')}</button>
+  </form></div>`;
+}
 function loginHtml(){
   const noUsers=!(settings().users||[]).length;
+  if(S.mode==='sbauth')return `<div class="login"><div class="login-art">${LOGO(72)}<h1>${t('app')}</h1><p>${t('tagline')}</p></div>${sbLoginHtml()}</div>`;
   return `<div class="login"><div class="login-art">${LOGO(72)}<h1>${t('app')}</h1><p>${t('tagline')}</p>
   <div class="feat"><div>${ic('wallet')}${t('feat1')}</div><div>${ic('cart')}${t('feat2')}</div><div>${ic('wa')}${t('feat3')}</div></div></div>
   <div class="login-side"><form class="login-card" id="loginForm" autocomplete="on">
@@ -974,10 +1013,18 @@ function loginHtml(){
    ${S.mode==='nocloud'?`<div class="alert" style="margin:0">${ic('alert')}<div>${t('cloudFail')}</div></div><div class="row"><button type="button" class="btn primary" data-act="retryCloud" style="flex:1">${t('retry')}</button><button type="button" class="btn" data-act="useLocal" style="flex:1">${t('useLocal')}</button></div>`:
    `<button class="btn primary" id="lbtn" ${S.ready?'':'disabled'}>${S.ready?t('signIn'):(S.mode==='connecting'?t('cloudConnecting'):t('loadingData'))}</button>`}
    ${S.ready&&noUsers?`<div class="hint">${t('defaultHint')}</div>`:''}
-   <div class="small muted" style="display:flex;gap:6px;align-items:center"><span class="dot ${S.mode}"></span>${S.ready?(S.mode==='cloud'?t('storageCloud'):t('storageLocal')):''}</div>
+   <div class="small muted" style="display:flex;gap:6px;align-items:center"><span class="dot ${S.mode}"></span>${S.ready?(S.mode==='cloud'?t('storageCloud'):t('storageLocal')):''}${SB.client?`<button type="button" class="btn sm ghost" data-act="sbOut" style="margin-inline-start:auto">${t('sbOut')}</button>`:''}</div>
   </form></div></div>`;
 }
 function bindLogin(){
+  const sf=$('#sbForm');
+  if(sf){sf.addEventListener('submit',async e=>{e.preventDefault();const b=$('#sbtn');b.disabled=true;$('#serr').textContent='';
+    try{const c=await SB.get();const {error}=await c.auth.signInWithPassword({email:$('#se').value.trim(),password:$('#sp').value});
+      if(error){$('#serr').textContent=t('sbWrong');b.disabled=false;return}
+      Store.db=null;Store.subscribed=false;await Store.init();
+      if(S.mode==='nocloud'){$('#serr')&&($('#serr').textContent=t('sbNoAccess'))}
+      loadSession();if(S.user&&S.user.isDefault&&(settings().users||[]).length)S.user=null;render();
+    }catch(err){$('#serr').textContent=t('cloudFail');b.disabled=false}});return}
   $('#loginForm').addEventListener('submit',async e=>{e.preventDefault();if(!S.ready)return;
     S.remember=!!($('#lrem')&&$('#lrem').checked);const ok=await doLogin($('#lu').value,$('#lp').value);
     if(ok){saveSession();S.route='dashboard';render()}else $('#lerr').textContent=t('wrongLogin')});
@@ -1891,6 +1938,7 @@ const ACT={
   addUnit(){S.itemDraft.units.push({name:'',factor:'',price:'',cost:''});render();const n=$$('[data-iu$=":name"]').pop();n&&n.focus()},
   rmUnit(el){S.itemDraft.units.splice(+el.dataset.i,1);render()},
   saveItem(){saveItem()},
+  async sbOut(){try{const c=await SB.get();await c.auth.signOut()}catch(e){}location.reload()},
   async retryCloud(){S.mode='connecting';render();await Store.init();if(S.ready){loadSession();if(S.user&&S.user.isDefault&&(settings().users||[]).length)S.user=null}render()},
   useLocal(){Store.loadLocal();S.mode='local';S.ready=true;render()},
   migrate(){openMigrate()},
