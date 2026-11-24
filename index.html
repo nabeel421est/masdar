@@ -157,7 +157,8 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .pm-benefit.on{background:linear-gradient(135deg,#a3172f,#d8314c)}
 .pm-credit.on{background:var(--g-gold);color:#2a1f05}
 .dash-acts{flex-wrap:wrap;gap:8px}
-.chart-f{margin:10px 0 6px}.chart-sum{flex-wrap:wrap;gap:14px;margin-bottom:6px}
+.chart-f{margin:10px 0 6px}
+@media(max-width:520px){.grid.g4.v-f{grid-template-columns:1fr 1fr}.grid.g4.v-f>div[style*="span 3"]{grid-column:span 2!important}}.chart-sum{flex-wrap:wrap;gap:14px;margin-bottom:6px}
 @media(max-width:520px){.grid.g4.chart-f{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.dash-acts{width:100%}.dash-acts .btn{flex:1 1 calc(50% - 8px);justify-content:center}.dash-acts .btn.primary{flex-basis:100%}}
 .pm-transfer.on{background:linear-gradient(135deg,#0f6e8c,#1c97b8)}
@@ -625,7 +626,7 @@ wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيح�
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
 logout:['خروج','Sign out'],hello:['مرحباً','Welcome'],hideMenu:['إخفاء القائمة','Hide menu'],showMenu:['إظهار القائمة','Show menu'],lang:['English','العربية'],
 dashboard:['لوحة التحكم','Dashboard'],accounts:['الحسابات','Accounts'],inventory:['المخزون','Inventory'],sales:['المبيعات','Sales'],purchases:['المشتريات','Purchases'],settings:['الإعدادات','Settings'],
-statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
+statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
 custBalances:['أرصدة العملاء','Customer balances'],suppBalances:['أرصدة الموردين','Supplier balances'],
 items:['قائمة الأصناف','Items list'],itemForm:['إضافة صنف جديد','Add new item'],stockCount:['جرد المخزون','Stock count'],
 'doc-sale':['إضافة فاتورة مبيعات','New sales invoice'],'list-sale':['تقرير المبيعات','Sales report'],
@@ -1422,7 +1423,7 @@ function vParty(v){if(v.partyType==='other'||!v.partyId)return v.partyName||v.ca
 function voucherPage(kind){
   if(!S.vdraft||S.vdraft.kind!==kind)S.vdraft={kind,date:today(),partyType:kind==='receipt'?'customer':'supplier',partyId:'',partyName:'',amount:'',method:'cash',notes:''};
   const v=S.vdraft;const f=getF('v-'+kind);
-  const vq=(f.q||'').trim().toLowerCase();const list=S.data.vouchers.filter(x=>x.kind===kind&&inRange(x.date,f)&&(!f.method||x.method===f.method)&&(!vq||((kind==='receipt'?'rv-':'pv-')+pad(x.no)).includes(vq)||vParty(x).toLowerCase().includes(vq)||(x.notes||'').toLowerCase().includes(vq)||(x.category||'').toLowerCase().includes(vq))).sort((a,b)=>b.date.localeCompare(a.date)||b.no-a.no);const tot=list.reduce((s,x)=>s+(+x.amount||0),0);
+  const vq=(f.q||'').trim().toLowerCase();const fAmt=f.amt===''||f.amt==null?null:+f.amt;const list=S.data.vouchers.filter(x=>x.kind===kind&&inRange(x.date,f)&&(!f.method||x.method===f.method)&&(!f.name||vParty(x)===f.name)&&(fAmt===null||isNaN(fAmt)||Math.abs((+x.amount||0)-fAmt)<0.0005)&&(!vq||((kind==='receipt'?'rv-':'pv-')+pad(x.no)).includes(vq)||vParty(x).toLowerCase().includes(vq)||(x.notes||'').toLowerCase().includes(vq)||(x.category||'').toLowerCase().includes(vq))).sort((a,b)=>b.date.localeCompare(a.date)||b.no-a.no);const tot=list.reduce((s,x)=>s+(+x.amount||0),0);
   const bal=v.partyType!=='other'&&v.partyId?partyBalance(v.partyType,v.partyId):null;
   return `<div class="pg-head"><div><h2>${t(kind)}</h2><p>${kind==='receipt'?'RV':'PV'}-${pad(v.no||nextVNo(kind))} ${v.id?`<span class="tag gold">${t('edit')}</span>`:''}</p></div></div>
   <div class="card"><div class="grid g4">
@@ -1435,8 +1436,15 @@ function voucherPage(kind){
     <div style="grid-column:span 2">${fld(t('notes'),`<input data-v="notes" value="${h(v.notes)}">`)}</div>
     ${fld(t('balance'),`<input readonly value="${bal===null?'—':money(bal)}">`)}
   </div><div class="row end" style="margin-top:16px"><button class="btn" data-act="saveVoucher">${t('save')}</button><button class="btn primary" data-act="saveVoucher" data-print="1">${ic('pdf')}${t('savePrint')}</button></div></div>
-  <div class="card"><div class="between" style="margin-bottom:12px"><h3 style="margin:0">${t('voucherList')}</h3><div class="row">
-   <input style="width:170px" placeholder="${t('search')}" data-filter="v-${kind}:q" value="${h(f.q||'')}"><select style="width:auto" data-filter="v-${kind}:method">${opt('',t('method')+': '+t('all'),f.method||'')}${[...new Set(VM.concat(S.data.vouchers.filter(x=>x.kind===kind).map(x=>x.method).filter(Boolean)))].map(m=>opt(m,t(m),f.method||'')).join('')}</select><input type="date" style="width:auto" data-filter="v-${kind}:from" value="${h(f.from)}"><input type="date" style="width:auto" data-filter="v-${kind}:to" value="${h(f.to)}"></div></div>
+  <div class="card"><div class="between" style="margin-bottom:8px"><h3 style="margin:0">${t('voucherList')}</h3>${f.name||f.amt||f.method||f.q?`<button type="button" class="btn sm ghost" data-act="vClear" data-k="v-${kind}">✕ ${t('clearFilters')}</button>`:''}</div>
+  <div class="grid g4 v-f" style="margin-bottom:12px">
+   ${fld(t('name'),`<select data-filter="v-${kind}:name">${opt('',t('all'),f.name||'')}${[...new Set(S.data.vouchers.filter(x=>x.kind===kind).map(vParty).filter(n=>n&&n!=='—'))].sort((a,b)=>a.localeCompare(b,'ar')).map(n=>opt(n,n,f.name||'')).join('')}</select>`)}
+   ${fld(t('amount'),`<input type="number" step="any" min="0" inputmode="decimal" data-filter="v-${kind}:amt" value="${h(f.amt||'')}" placeholder="${fx(0)}">`)}
+   ${fld(t('from'),`<input type="date" data-filter="v-${kind}:from" value="${h(f.from)}">`)}
+   ${fld(t('to'),`<input type="date" data-filter="v-${kind}:to" value="${h(f.to)}">`)}
+   ${fld(t('method'),`<select data-filter="v-${kind}:method">${opt('',t('all'),f.method||'')}${[...new Set(VM.concat(S.data.vouchers.filter(x=>x.kind===kind).map(x=>x.method).filter(Boolean)))].map(m=>opt(m,t(m),f.method||'')).join('')}</select>`)}
+   <div style="grid-column:span 3">${fld(t('search').replace('…',''),`<input data-filter="v-${kind}:q" value="${h(f.q||'')}" placeholder="${t('vSearchPh')}">`)}</div>
+  </div>
   ${list.length?`<div class="tbl-wrap"><table class="t"><thead><tr><th>${t('no')}</th><th>${t('date')}</th><th>${t('party')}</th><th>${t('method')}</th><th>${t('notes')}</th><th class="n">${t('amount')}</th><th></th></tr></thead><tbody>
    ${list.map(x=>`<tr class="click" data-act="openVoucher" data-id="${x.id}"><td><b>${(kind==='receipt'?'RV-':'PV-')+pad(x.no)}</b></td><td>${h(x.date)}</td><td>${h(vParty(x))} <span class="tag">${x.partyType==='other'&&x.category?h(x.category):t(x.partyType==='other'?'other':x.partyType)}</span></td><td>${t(x.method)}</td><td class="muted">${h(x.notes)}</td><td class="n"><b>${fmt(x.amount)}</b></td><td class="n">${ic('eye')}</td></tr>`).join('')}
   </tbody><tfoot><tr><td colspan="5">${t('total')}</td><td class="n">${fmt(tot)}</td><td></td></tr></tfoot></table></div>`:`<div class="empty">${t('noData')}</div>`}</div>`;
@@ -1992,6 +2000,7 @@ const ACT={
   addUnit(){S.itemDraft.units.push({name:'',factor:'',price:'',cost:''});render();const n=$$('[data-iu$=":name"]').pop();n&&n.focus()},
   rmUnit(el){S.itemDraft.units.splice(+el.dataset.i,1);render()},
   saveItem(){saveItem()},
+  vClear(el){const F=getF(el.dataset.k);F.name='';F.amt='';F.method='';F.q='';F.from=monthStart();F.to=today();render()},
   async sbOut(){if(!S.user||!isAdmin())return;if(!await confirmDlg(t('sbOutConfirm'),1))return;try{const c=await SB.get();await c.auth.signOut()}catch(e){}location.reload()},
   async retryCloud(){S.mode='connecting';render();await Store.init();if(S.ready){loadSession();if(S.user&&S.user.isDefault&&(settings().users||[]).length)S.user=null}render()},
   useLocal(){Store.loadLocal();S.mode='local';S.ready=true;render()},
@@ -2048,7 +2057,7 @@ document.addEventListener('input',e=>{
   if(ds.filter&&(el.type==='text'||el.type==='search'||(el.tagName==='INPUT'&&!el.type))){const [k,f]=ds.filter.split(':');getF(k)[f]=el.value;clearTimeout(fT);fT=setTimeout(()=>{const pos=el.selectionStart;render();const n=$(`[data-filter="${ds.filter}"]`);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},280);return}
   if(el.closest('form'))S.dirty=true;
 });
-let fT=null;
+let fT=null,fRT=null;
 document.addEventListener('change',e=>{
   const el=e.target;const ds=el.dataset;
   if((ds.it==='nameEn'||ds.it==='name')&&S.itemDraft){S.itemDraft[ds.it]=el.value;clearTimeout(trT);S.itemDraft._trSrc=ds.it==='name'?'ar2en':'en2ar';autoTranslate(false,S.itemDraft._trSrc);return}
@@ -2059,7 +2068,7 @@ document.addEventListener('change',e=>{
   if((ds.v==='partyType'||ds.v==='partyId')&&S.vdraft){S.vdraft[ds.v]=el.value;if(ds.v==='partyType')S.vdraft.partyId='';render();return}
   if(ds.iu&&S.itemDraft){const [i,f]=ds.iu.split(':');if(f==='factor'){const u=S.itemDraft.units[+i];const fc=+u.factor||0;const d=S.itemDraft;
       if(fc>0){if(!(+u.price)){u.price=fx((+d.price||0)*fc);const x=$(`[data-iu="${i}:price"]`);if(x)x.value=u.price}if(!(+u.cost)){u.cost=fx((+d.cost||0)*fc);const x=$(`[data-iu="${i}:cost"]`);if(x)x.value=u.cost}}}return}
-  if(ds.filter){if(el.tagName==='INPUT'&&el.type==='text')return;const [k,f]=ds.filter.split(':');const F=getF(k);F[f]=el.type==='checkbox'?el.checked:el.value;render()}
+  if(ds.filter){if(el.tagName==='INPUT'&&el.type==='text')return;const [k,f]=ds.filter.split(':');const F=getF(k);F[f]=el.type==='checkbox'?el.checked:el.value;clearTimeout(fRT);fRT=setTimeout(render,0)}
 });
 function fitPreview(){const w=$('#pvWrap'),f=$('#pvFit'),p=$('#pvPaper');if(!w||!f||!p)return;const cs=getComputedStyle(w);const avail=w.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);const nar=!!p.querySelector('.rep80');p.classList.toggle('narrow',nar);const pw=nar?340:794;const sc=Math.min(1,avail/pw);p.style.transform=`scale(${sc})`;f.style.width=(pw*sc)+'px';f.style.height=(p.offsetHeight*sc)+'px'}
 window.addEventListener('resize',fitPreview);
