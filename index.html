@@ -653,7 +653,7 @@ debit:['مدين','Debit'],credit:['دائن','Credit'],desc:['البيان','De
 newCustomer:['عميل جديد','New customer'],newSupplier:['مورد جديد','New supplier'],editCustomer:['تعديل عميل','Edit customer'],editSupplier:['تعديل مورد','Edit supplier'],
 owesUs:['له علينا / عليه لنا','Balance'],custOwes:['مستحق على العميل','Owed by customer'],weOwe:['مستحق للمورد','Owed to supplier'],
 hideZero:['إخفاء الأرصدة الصفرية','Hide zero balances'],kind:['النوع','Type'],chooseParty:['اختر الحساب','Choose account'],
-amount:['المبلغ','Amount'],method:['طريقة الدفع','Method'],cash:['نقداً','Cash'],bank:['تحويل بنكي','Bank transfer'],cheque:['شيك','Cheque'],card:['بطاقة','Card'],
+amount:['المبلغ','Amount'],method:['طريقة الدفع','Method'],cash:['نقداً','Cash'],bank:['تحويل بنكي','Bank transfer'],benefit:['بنفت','BenefitPay'],transfer:['تحويل','Transfer'],cheque:['شيك','Cheque'],card:['بطاقة','Card'],
 partyType:['نوع الحساب','Account type'],other:['أخرى / مصروفات','Other / expenses'],receivedFrom:['استلمنا من','Received from'],paidTo:['صرفنا إلى','Paid to'],
 voucherList:['السندات المسجلة','Recorded vouchers'],
 code:['الكود','Code'],cost:['سعر الشراء','Purchase price'],nameAr:['اسم الصنف (عربي)','Item name (Arabic)'],nameEn:['اسم الصنف (إنجليزي)','Item name (English)'],baseUnit:['الوحدة الأساسية','Base unit'],otherUnits:['وحدات أخرى','Other units'],addUnit:['إضافة وحدة','Add unit'],unitName:['اسم الوحدة','Unit name'],factor:['معامل التحويل','Conversion factor'],units:['الوحدات','Units'],autoCode:['رقم عشوائي من 12 خانة يُولَّد تلقائياً ولا يتكرر','Random unique 12-digit number, generated automatically'],newCode:['توليد كود آخر','Generate another code'],factorHint:['معامل التحويل = عدد الوحدات الأساسية في هذه الوحدة. مثال: إذا كانت الوحدة الأساسية «حبة» والكرتون فيه 12 حبة، فالمعامل 12.','Conversion factor = how many base units this unit holds. Example: if the base unit is “pcs” and a carton holds 12, the factor is 12.'],unitErr:['تحقق من الوحدات: اسم الوحدة مطلوب، والمعامل أكبر من صفر، ولا يتكرر اسم الوحدة','Check the units: a name is required, the factor must be above zero, and names must not repeat'],codeExists:['كود الصنف مستخدم لصنف آخر','This item code is already used'],stockInBase:['الأرصدة والجرد بالوحدة الأساسية','Stock and counts are kept in the base unit'],itemData:['بيانات الصنف','Item details'],stockData:['المخزون','Stock'],salePrice:['سعر البيع','Sale price'],openingQty:['الكمية الافتتاحية','Opening qty'],minQty:['حد الطلب','Reorder level'],
@@ -741,6 +741,7 @@ const itemMatch=(i,q)=>!q||(i.name||'').toLowerCase().includes(q)||(i.nameEn||''
 const partyCol=k=>k==='customer'?'customers':'suppliers';
 const docNo=(type,d)=>DOCS[type].prefix+'-'+pad(d.no||0);
 const PM=['cash','benefit','credit'];const PPM=['cash','benefit','transfer','credit'];const PM_IC={cash:'cash',benefit:'phone',transfer:'bank',credit:'clock'};
+const VM=['benefit','cash','transfer'];const vmOpts=cur=>VM.concat(cur&&!VM.includes(cur)?[cur]:[]);
 const hasPM=type=>type==='sale'||type==='purchase';const pmList=type=>type==='purchase'?PPM:PM;const NONCASH=['benefit','transfer'];
 function pmOf(d){return d.payMethod||(docTotals(d).rem>0.0005?'credit':'cash')}
 function paidLocked(d){const cfg=DOCS[d.type];if(!cfg||!cfg.money)return false;if(hasPM(d.type))return d.payMethod!=='credit';return !d.partyId}
@@ -785,7 +786,7 @@ function partyBalance(kind,id){return rnd(balOf(kind,ledger(kind,id)))}
 function cashBalance(){
   let c=0;
   for(const [type,cfg] of Object.entries(DOCS)){if(!cfg.money)continue;const sign=(type==='sale'||type==='purchaseReturn')?1:-1;for(const d of S.data[cfg.col]){if(hasPM(type)&&NONCASH.includes(pmOf(d)))continue;c+=sign*(+d.paid||0)}}
-  for(const v of S.data.vouchers)c+=(v.kind==='receipt'?1:-1)*(+v.amount||0);
+  for(const v of S.data.vouchers){if(v.method&&v.method!=='cash')continue;c+=(v.kind==='receipt'?1:-1)*(+v.amount||0)}
   return rnd(c);
 }
 function partyUsed(kind,id){if(S.data.vouchers.some(v=>v.partyType===kind&&v.partyId===id))return true;return Object.values(DOCS).some(c=>c.party===kind&&S.data[c.col].some(d=>d.partyId===id))}
@@ -1429,13 +1430,13 @@ function voucherPage(kind){
     ${fld(t('partyType'),`<select data-v="partyType">${opt('customer',t('customer'),v.partyType)}${opt('supplier',t('supplier'),v.partyType)}${opt('other',t('other'),v.partyType)}</select>`)}
     ${v.partyType==='other'?fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<input data-v="partyName" value="${h(v.partyName)}">`,kind==='receipt'):fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<div class="row" style="flex-wrap:nowrap;gap:6px"><select data-v="partyId">${partyOpts(v.partyType,v.partyId,'—')}</select><button type="button" class="btn icon primary" data-act="quickParty" data-kind="${v.partyType}" title="${t(v.partyType==='customer'?'newCustomer':'newSupplier')}">${ic('plus')}</button></div>`,1)}
     ${fld(t('amount'),`<input type="number" step="any" min="0" class="money" data-v="amount" value="${v.amount===''||v.amount==null?'':fx(v.amount)}" placeholder="${fx(0)}">`,1)}
-    ${fld(t('method'),`<select data-v="method">${['cash','bank','cheque','card'].map(m=>opt(m,t(m),v.method)).join('')}</select>`)}
+    ${fld(t('method'),`<select data-v="method">${vmOpts(v.method).map(m=>opt(m,t(m),v.method||'cash')).join('')}</select>`)}
     ${kind==='payment'&&v.partyType==='other'?fld(t('category'),`<select data-v="category">${expCats().map(c=>opt(c,c,v.category||expCats()[0])).join('')}</select>`,1):''}
     <div style="grid-column:span 2">${fld(t('notes'),`<input data-v="notes" value="${h(v.notes)}">`)}</div>
     ${fld(t('balance'),`<input readonly value="${bal===null?'—':money(bal)}">`)}
   </div><div class="row end" style="margin-top:16px"><button class="btn" data-act="saveVoucher">${t('save')}</button><button class="btn primary" data-act="saveVoucher" data-print="1">${ic('pdf')}${t('savePrint')}</button></div></div>
   <div class="card"><div class="between" style="margin-bottom:12px"><h3 style="margin:0">${t('voucherList')}</h3><div class="row">
-   <input style="width:170px" placeholder="${t('search')}" data-filter="v-${kind}:q" value="${h(f.q||'')}"><select style="width:auto" data-filter="v-${kind}:method">${opt('',t('method')+': '+t('all'),f.method||'')}${['cash','bank','cheque','card'].map(m=>opt(m,t(m),f.method||'')).join('')}</select><input type="date" style="width:auto" data-filter="v-${kind}:from" value="${h(f.from)}"><input type="date" style="width:auto" data-filter="v-${kind}:to" value="${h(f.to)}"></div></div>
+   <input style="width:170px" placeholder="${t('search')}" data-filter="v-${kind}:q" value="${h(f.q||'')}"><select style="width:auto" data-filter="v-${kind}:method">${opt('',t('method')+': '+t('all'),f.method||'')}${[...new Set(VM.concat(S.data.vouchers.filter(x=>x.kind===kind).map(x=>x.method).filter(Boolean)))].map(m=>opt(m,t(m),f.method||'')).join('')}</select><input type="date" style="width:auto" data-filter="v-${kind}:from" value="${h(f.from)}"><input type="date" style="width:auto" data-filter="v-${kind}:to" value="${h(f.to)}"></div></div>
   ${list.length?`<div class="tbl-wrap"><table class="t"><thead><tr><th>${t('no')}</th><th>${t('date')}</th><th>${t('party')}</th><th>${t('method')}</th><th>${t('notes')}</th><th class="n">${t('amount')}</th><th></th></tr></thead><tbody>
    ${list.map(x=>`<tr class="click" data-act="openVoucher" data-id="${x.id}"><td><b>${(kind==='receipt'?'RV-':'PV-')+pad(x.no)}</b></td><td>${h(x.date)}</td><td>${h(vParty(x))} <span class="tag">${x.partyType==='other'&&x.category?h(x.category):t(x.partyType==='other'?'other':x.partyType)}</span></td><td>${t(x.method)}</td><td class="muted">${h(x.notes)}</td><td class="n"><b>${fmt(x.amount)}</b></td><td class="n">${ic('eye')}</td></tr>`).join('')}
   </tbody><tfoot><tr><td colspan="5">${t('total')}</td><td class="n">${fmt(tot)}</td><td></td></tr></tfoot></table></div>`:`<div class="empty">${t('noData')}</div>`}</div>`;
@@ -1886,7 +1887,7 @@ function dayData(date){const f={from:date,to:date};const byPm={};PM.forEach(m=>b
   const refunds=sumPaid('salesReturns'),purch=S.data.purchases.filter(d=>d.date===date&&!NONCASH.includes(pmOf(d))).reduce((s,d)=>s+(+d.paid||0),0),purchRet=sumPaid('purchaseReturns');
   const cashIn=vm('receipt','cash'),cashOut=vm('payment','cash');
   const expected=cashSales+cashIn-cashOut-refunds-purch+purchRet;
-  const methods=['cash','bank','cheque','card'];
+  const methods=[...new Set(VM.concat(V.map(v=>v.method).filter(Boolean)))];
   return {byPm,total:PM.reduce((s,m)=>s+byPm[m].t,0),cashSales,cashIn,cashOut,refunds,purch,purchRet,expected,V,
     vrows:methods.map(m=>[t(m),vm('receipt',m),vm('payment',m)]),exp:expenseRows(f).reduce((s,v)=>s+(+v.amount||0),0)};}
 PAGES.dailyClose={html(){const f=getF('dc',{date:today(),actual:''});const D=dayData(f.date);const act=f.actual===''?null:+f.actual;const diff=act===null?null:act-D.expected;
