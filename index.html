@@ -157,6 +157,8 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .pm-benefit.on{background:linear-gradient(135deg,#a3172f,#d8314c)}
 .pm-credit.on{background:var(--g-gold);color:#2a1f05}
 .dash-acts{flex-wrap:wrap;gap:8px}
+.chart-f{margin:10px 0 6px}.chart-sum{flex-wrap:wrap;gap:14px;margin-bottom:6px}
+@media(max-width:520px){.grid.g4.chart-f{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.dash-acts{width:100%}.dash-acts .btn{flex:1 1 calc(50% - 8px);justify-content:center}.dash-acts .btn.primary{flex-basis:100%}}
 .pm-transfer.on{background:linear-gradient(135deg,#0f6e8c,#1c97b8)}
 .paym-opts.four{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -662,7 +664,7 @@ countSheet:['نموذج جرد فارغ','Blank count sheet'],countHistory:['ع�
 countSaved:['تم اعتماد الجرد وتعديل الأرصدة','Count posted and stock adjusted'],noDiff:['لا توجد فروقات لاعتمادها','No differences to post'],
 todaySales:['مبيعات اليوم','Today\'s sales'],monthSales:['مبيعات الشهر','Sales this month'],monthPurch:['مشتريات الشهر','Purchases this month'],cashBox:['رصيد الصندوق','Cash on hand'],
 receivables:['ذمم العملاء','Receivables'],payables:['ذمم الموردين','Payables'],itemsCount:['عدد الأصناف','Items'],lowStock:['أصناف تحت حد الطلب','Low-stock items'],
-last7:['المبيعات والمشتريات — آخر 7 أيام','Sales & purchases — last 7 days'],recent:['آخر الحركات','Recent activity'],quick:['إجراءات سريعة','Quick actions'],
+last7:['المبيعات والمشتريات — آخر 7 أيام','Sales & purchases — last 7 days'],chartTitle:['المبيعات والمشتريات','Sales & purchases'],show:['العرض','Show'],salesAndPurch:['المبيعات والمشتريات','Sales & purchases'],p7:['آخر 7 أيام','Last 7 days'],p30:['آخر 30 يوماً','Last 30 days'],thisMonth:['هذا الشهر','This month'],pickDate:['تاريخ محدد','Pick dates'],recent:['آخر الحركات','Recent activity'],quick:['إجراءات سريعة','Quick actions'],
 changeDefault:['أنت تستخدم كلمة المرور الافتراضية. غيّرها من الإعدادات.','You are using the default password. Change it in Settings.'],
 company:['بيانات المنشأة','Business details'],companyAr:['اسم المنشأة (عربي)','Business name (Arabic)'],companyEn:['اسم المنشأة (إنجليزي)','Business name (English)'],
 currency:['العملة (عربي)','Currency (Arabic)'],currencyEn:['العملة (إنجليزي)','Currency (English)'],decimals:['عدد الخانات العشرية','Decimal places'],defTax:['نسبة الضريبة الافتراضية للأصناف الجديدة %','Default tax rate for new items %'],taxSec:['الضريبة','Tax'],taxable:['الصنف خاضع للضريبة','Item is taxable'],taxRateItem:['نسبة الضريبة %','Tax rate %'],taxMode:['طريقة احتساب الضريبة','Tax calculation'],incl:['شامل الضريبة','Tax inclusive'],excl:['غير شامل (باستثناء الضريبة)','Tax exclusive'],inclShort:['شامل','incl.'],exclShort:['باستثناء','excl.'],exempt:['معفى','Exempt'],applyTax:['تطبيق الضريبة','Apply tax'],subNet:['المجموع قبل الضريبة','Subtotal before tax'],inclHint:['شامل: الأسعار المدخلة تتضمن الضريبة وتُستخرج منها. باستثناء: تُضاف الضريبة فوق السعر.','Inclusive: entered prices already contain the tax, which is extracted. Exclusive: tax is added on top of the price.'],exemptHint:['الصنف معفى — لا تُحسب عليه ضريبة في الفواتير.','Exempt item — no tax is charged on it in invoices.'],taxCol:['الضريبة','Tax'],taxDefaultOn:['تفعيل الضريبة تلقائياً في الفواتير الجديدة','Apply tax on new invoices by default'],taxOnLbl:['تفعيل الضريبة','Apply tax'],cc:['رمز الدولة لواتساب','WhatsApp country code'],
@@ -1198,11 +1200,19 @@ PAGES.dashboard={html(){
   const st=stockMap();const low=S.data.items.filter(i=>st[i.id]<=(+i.minQty||0)&&(+i.minQty||st[i.id]<=0));
   const kp=(cls,icn,lab,val)=>`<div class="kpi ${cls}"><div class="ic">${ic(icn)}</div><div><span>${lab}</span><b>${val}</b></div></div>`;
   // chart
-  const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+pad(d.getMonth()+1,2)+'-'+pad(d.getDate(),2);days.push(k)}
-  const sv=days.map(k=>sum(S.data.sales,d=>d.date===k)),pv=days.map(k=>sum(S.data.purchases,d=>d.date===k));const mx=Math.max(1,...sv,...pv);
-  const W=640,H=210,bw=26,gap=(W-40)/7;
-  let bars='';days.forEach((k,i)=>{const x=30+i*gap+gap/2;const hs=(sv[i]/mx)*(H-50),hp=(pv[i]/mx)*(H-50);
-    bars+=`<rect x="${x-bw-2}" y="${H-30-hs}" width="${bw}" height="${hs}" rx="6" fill="url(#gS)"><title>${t('sales')}: ${fmt(sv[i])}</title></rect><rect x="${x+2}" y="${H-30-hp}" width="${bw}" height="${hp}" rx="6" fill="url(#gP)"><title>${t('purchases')}: ${fmt(pv[i])}</title></rect><text x="${x}" y="${H-10}" text-anchor="middle" font-size="12" fill="#64716e">${k.slice(5)}</text>`});
+  const CF=getF('dash',{show:'all',period:'7'});const ds=k=>{const d=new Date();d.setDate(d.getDate()-k);return d.getFullYear()+'-'+pad(d.getMonth()+1,2)+'-'+pad(d.getDate(),2)};
+  let cFrom=td,cTo=td;if(CF.period==='7')cFrom=ds(6);else if(CF.period==='30')cFrom=ds(29);else if(CF.period==='month')cFrom=ms;else if(CF.period==='custom'){cFrom=CF.from||ms;cTo=CF.to||td;if(cFrom>cTo){const x=cFrom;cFrom=cTo;cTo=x}}
+  const dayList=[];{const d=new Date(cFrom+'T00:00:00'),e=new Date(cTo+'T00:00:00');let n=0;while(d<=e&&n<400){dayList.push(d.getFullYear()+'-'+pad(d.getMonth()+1,2)+'-'+pad(d.getDate(),2));d.setDate(d.getDate()+1);n++}}
+  const byMonth=dayList.length>62;const buckets=byMonth?[...new Set(dayList.map(k=>k.slice(0,7)))].map(m=>({lab:m,f:k=>k.slice(0,7)===m})):dayList.map(k=>({lab:dayList.length===1?k:k.slice(5),f:x=>x===k}));
+  const showS=CF.show!=='purchases',showP=CF.show!=='sales';
+  const sv=buckets.map(b=>showS?sum(S.data.sales,d=>b.f(d.date)):0),pv=buckets.map(b=>showP?sum(S.data.purchases,d=>b.f(d.date)):0);const mx=Math.max(1,...sv,...pv);
+  const sTot=sv.reduce((a,b)=>a+b,0),pTot=pv.reduce((a,b)=>a+b,0);
+  const W=640,H=210,nB=buckets.length,gap=(W-40)/nB,two=showS&&showP,bw=Math.max(3,Math.min(two?26:40,gap*(two?.38:.6))),lblEvery=Math.max(1,Math.ceil(nB/8));
+  let bars='';buckets.forEach((bk,i)=>{const x=30+i*gap+gap/2;const hs=(sv[i]/mx)*(H-50),hp=(pv[i]/mx)*(H-50);
+    const xs=two?x-bw-2:x-bw/2,xp=two?x+2:x-bw/2;
+    if(showS)bars+=`<rect x="${xs}" y="${H-30-hs}" width="${bw}" height="${hs}" rx="${Math.min(6,bw/2)}" fill="url(#gS)"><title>${bk.lab} · ${t('sales')}: ${fmt(sv[i])}</title></rect>`;
+    if(showP)bars+=`<rect x="${xp}" y="${H-30-hp}" width="${bw}" height="${hp}" rx="${Math.min(6,bw/2)}" fill="url(#gP)"><title>${bk.lab} · ${t('purchases')}: ${fmt(pv[i])}</title></rect>`;
+    if(i%lblEvery===0||nB<=8)bars+=`<text x="${x}" y="${H-10}" text-anchor="middle" font-size="12" fill="#64716e">${bk.lab}</text>`});
   const grid=[0,.5,1].map(f=>`<line x1="20" x2="${W-10}" y1="${H-30-f*(H-50)}" y2="${H-30-f*(H-50)}" stroke="#e2e7e5"/><text x="${isAr()?W-6:4}" y="${H-34-f*(H-50)}" font-size="10" fill="#94a19e" text-anchor="${isAr()?'end':'start'}">${fq(mx>=10?Math.round(mx*f):mx*f)}</text>`).join('');
   // recent
   const recent=[];for(const [type,cfg] of Object.entries(DOCS))S.data[cfg.col].forEach(d=>recent.push({type,d,ts:d.createdAt||0}));
@@ -1218,7 +1228,11 @@ PAGES.dashboard={html(){
   ${(()=>{const P=pendingLocal();return P?`<div class="alert mig-banner">${ic('up')}<div style="flex:1">${t('migBanner').replace('{n}',P.n)}</div><button class="btn sm primary" data-act="migrate">${t('migReview')}</button></div>`:''})()}
   <div class="kpis">${kp('','cart',t('todaySales'),money(tSales))}${kp('','up',t('monthSales'),money(mSales))}${kp('g','truck',t('monthPurch'),money(mPur))}${kp('s','cash',t('cashBox'),money(cashBalance()))}
   ${kp('','users',t('receivables'),money(rec))}${kp('g','users',t('payables'),money(pay))}${kp('o','box',t('itemsCount'),S.data.items.length)}${kp(low.length?'r':'o','alert',t('lowStock'),low.length)}</div>
-  <div class="dash"><div><div class="card"><div class="between"><h3>${t('last7')}</h3><div class="row small"><span><span class="dot" style="background:linear-gradient(#1f3f8a,#0a1435)"></span> ${t('sales')}</span><span><span class="dot" style="background:linear-gradient(#f0d791,#b08632)"></span> ${t('purchases')}</span></div></div>
+  <div class="dash"><div><div class="card"><h3>${t('chartTitle')}</h3>
+    <div class="grid g4 chart-f">${fld(t('show'),`<select data-filter="dash:show">${opt('all',t('all'),CF.show)}${opt('sales',t('sales'),CF.show)}${opt('purchases',t('purchases'),CF.show)}</select>`)}
+     ${fld(t('period'),`<select data-filter="dash:period">${opt('today',t('today'),CF.period)}${opt('7',t('p7'),CF.period)}${opt('30',t('p30'),CF.period)}${opt('month',t('thisMonth'),CF.period)}${opt('custom',t('pickDate'),CF.period)}</select>`)}
+     ${CF.period==='custom'?fld(t('from'),`<input type="date" data-filter="dash:from" value="${h(CF.from)}">`)+fld(t('to'),`<input type="date" data-filter="dash:to" value="${h(CF.to)}">`):''}</div>
+    <div class="row small chart-sum">${showS?`<span><span class="dot" style="background:linear-gradient(#1f3f8a,#0a1435)"></span> ${t('sales')}: <b>${money(sTot)}</b></span>`:''}${showP?`<span><span class="dot" style="background:linear-gradient(#f0d791,#b08632)"></span> ${t('purchases')}: <b>${money(pTot)}</b></span>`:''}<span class="muted">${cFrom===cTo?h(cFrom):h(cFrom)+' → '+h(cTo)}</span></div>
     <svg viewBox="0 0 ${W} ${H}" width="100%" style="direction:ltr"><defs><linearGradient id="gS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f3f8a"/><stop offset="1" stop-color="#0a1435"/></linearGradient><linearGradient id="gP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d791"/><stop offset="1" stop-color="#b08632"/></linearGradient></defs>${grid}${bars}</svg></div>
     <div class="card"><h3>${t('recent')}</h3>${rrows?`<div class="tbl-wrap"><table class="t compact"><tbody>${rrows}</tbody></table></div>`:`<div class="empty">${t('noData')}</div>`}</div></div>
   <div><div class="card"><h3>${t('quick')}</h3><div class="quick" id="quick">${[['doc-sale','cart'],['list-sale','file'],['doc-purchase','truck'],['receipt','down'],['payment','up'],['doc-issue','clip'],['doc-salesReturn','ret'],['itemForm','plus'],['items','box'],['customers','users'],['statement','wallet'],['custBalances','users'],['stockCount','clip'],['dailyClose','cash'],['profit','chart'],['expenses','up']].filter(([k])=>canSee(k)).map(([k,i])=>q(k,i)).join('')}</div><div class="q-track" aria-hidden="true"><i id="qThumb"></i></div></div>
