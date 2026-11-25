@@ -370,7 +370,10 @@ input:disabled{background:#f1f2f4;color:#9aa6a3}
 .dlg.wide{max-width:900px}.dlg.sm{max-width:420px;padding:22px}
 .dlg .mh{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
 .dlg .mh h3{margin:0;font-size:17px}
-.dlg .mb{padding:20px;overflow:auto}
+.dlg .mb{padding:20px;overflow:auto;flex:1 1 auto;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.dlg>form{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.dlg .mf{flex:0 0 auto;background:#fff}
+.dlg{max-height:92dvh}
 .dlg .mf{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .pv-wrap{background:#e9ecee;padding:18px;border-radius:12px;overflow:auto;max-height:58vh}
 .pv-paper{background:#fff;width:794px;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.12);transform-origin:top center}
@@ -622,7 +625,7 @@ html,body{max-width:100%;overflow-x:hidden}
   .totals{max-width:none}
   .totals .ln input{width:120px}
   .pv-wrap{padding:10px}
-  .dlg{max-height:94vh}.ov{padding:2vh 8px}
+  .dlg{max-height:94vh;max-height:94dvh}.ov{padding:2vh 8px}
 }
 </style>
 </head>
