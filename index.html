@@ -2158,7 +2158,7 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('[data-act]');if(a&&ACT[a.dataset.act]){if(a.tagName==='A'&&a.getAttribute('href'))return;e.preventDefault();ACT[a.dataset.act](a)}
 });
 document.addEventListener('focusout',e=>{const el=e.target;if(!el.classList||!el.classList.contains('money')||el.readOnly||el.value==='')return;const v=fx(el.value);if(v!==el.value){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}))}});
-document.addEventListener('focusin',e=>{const el=e.target;if(el.classList&&el.classList.contains('money')&&!el.readOnly)setTimeout(()=>{try{el.select()}catch(x){}},0)});
+document.addEventListener('focusin',e=>{const el=e.target;if(el.classList&&el.classList.contains('money')&&!el.readOnly)setTimeout(()=>{if(document.activeElement===el)try{el.select()}catch(x){}},0)});
 document.addEventListener('toggle',e=>{const d=e.target;if(!d.dataset||!d.dataset.grp)return;if(d.open){S.openGroup=d.dataset.grp;$$('details[data-grp]').forEach(x=>{if(x!==d&&x.open)x.open=false})}else if(S.openGroup===d.dataset.grp)S.openGroup=null},true);
 const isMobile=()=>window.matchMedia('(max-width:860px)').matches;
 function saveSide(){try{localStorage.setItem('masdar-side',S.sideCollapsed?'0':'1')}catch(e){}}
@@ -2198,11 +2198,19 @@ document.addEventListener('keydown',e=>{
     if(e.key==='Enter'){e.preventDefault();if(!e.target.value.trim())return;renderItemRes();const r=S.isRes||[];if(r.length)addItemToDraft(r[Math.min(S.isIdx||0,r.length-1)].id);return}
     if(e.key==='Escape'){e.stopPropagation();$('#itemRes').classList.add('hidden');return}}
   if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.it==='nameEn'){e.preventDefault();e.target.blur();return}
-  if(e.key==='Enter'&&e.target.dataset&&/:qty$|:price$/.test(e.target.dataset.l||'')){e.preventDefault();
-    const [li,lf]=e.target.dataset.l.split(':');const pr=lf==='qty'?$(`[data-l="${li}:price"]`):null;
+  if(e.key==='Enter'&&e.target.dataset&&/:qty$|:price$|:total$/.test(e.target.dataset.l||'')){e.preventDefault();
+    const [li,lf]=e.target.dataset.l.split(':');const pr=lf==='qty'?$(`[data-l="${li}:${S.draft&&S.draft.type==='purchase'?'total':'price'}"]`):null;
     if(pr){pr.focus({preventScroll:true});try{pr.select()}catch(x){}pr.scrollIntoView({block:'center',behavior:'smooth'});return}
     const inp=$('#itemSearch');if(inp){inp.focus();inp.scrollIntoView({block:'center',behavior:'smooth'})}return}
   if(e.key==='Escape'){if($('#confirm-root').innerHTML||$('#modal-root .lock'))return;closeModal()}});
+
+// purchase flow on phones (iOS number pad has no Enter key): qty → total → item search
+document.addEventListener('focusout',e=>{const el=e.target;if(!S.draft||S.draft.type!=='purchase'||!el.dataset||!el.dataset.l)return;
+  const [li,lf]=el.dataset.l.split(':');const nx=e.relatedTarget;
+  if(lf==='qty'){if(nx&&nx.dataset&&nx.dataset.l===li+':price'){const tt=$(`[data-l="${li}:total"]`);if(tt)setTimeout(()=>{tt.focus({preventScroll:true});try{tt.select()}catch(x){}tt.scrollIntoView({block:'center',behavior:'smooth'})},0)}return}
+  if(lf==='total'&&el.dataset.edited){delete el.dataset.edited;if(nx&&(nx.id==='itemSearch'||(nx.dataset&&nx.dataset.l&&nx.dataset.l.startsWith(li+':'))))return;
+    if(nx&&nx.closest&&nx.closest('#modal-root'))return;const si=$('#itemSearch');if(si)setTimeout(()=>{si.focus();si.scrollIntoView({block:'center',behavior:'smooth'})},0)}});
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.l&&/:total$/.test(el.dataset.l))el.dataset.edited='1'},true);
 
 /* ===================== boot ===================== */
 render();
