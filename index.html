@@ -158,6 +158,12 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .pm-credit.on{background:var(--g-gold);color:#2a1f05}
 .dash-acts{flex-wrap:wrap;gap:8px}
 .chart-f{margin:10px 0 6px}
+.rs{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
+.rs-none{background:#eef0f3;color:#5b6472}.rs-part{background:#fff1e0;color:#c25e00}.rs-full{background:#e3f6ea;color:#1a7f4b}
+.recv-card{border-inline-start:5px solid #c9ced6}.recv-card.rc-part{border-inline-start-color:#f08a1c}.recv-card.rc-full{border-inline-start-color:#22a35a}
+.recv-lines{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.recv-ln{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line,#e3e6ea);border-radius:12px;background:#fafbfc}
+.recv-ln.ok{background:#f1faf4;border-color:#cdebd8}.rl-main{display:flex;flex-direction:column;gap:2px;min-width:0}
 @media(max-width:520px){.grid.g4.v-f{grid-template-columns:1fr 1fr}.grid.g4.v-f>div[style*="span 3"]{grid-column:span 2!important}}.chart-sum{flex-wrap:wrap;gap:14px;margin-bottom:6px}
 @media(max-width:520px){.grid.g4.chart-f{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.dash-acts{width:100%}.dash-acts .btn{flex:1 1 calc(50% - 8px);justify-content:center}.dash-acts .btn.primary{flex-basis:100%}}
@@ -626,7 +632,7 @@ wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيح�
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
 logout:['خروج','Sign out'],hello:['مرحباً','Welcome'],hideMenu:['إخفاء القائمة','Hide menu'],showMenu:['إظهار القائمة','Show menu'],lang:['English','العربية'],
 dashboard:['لوحة التحكم','Dashboard'],accounts:['الحسابات','Accounts'],inventory:['المخزون','Inventory'],sales:['المبيعات','Sales'],purchases:['المشتريات','Purchases'],settings:['الإعدادات','Settings'],
-statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],quickItem:['صنف جديد','New item'],quickItemSave:['حفظ وإضافة للفاتورة','Save & add to invoice'],quickItemHint:['يُحفظ الصنف ويُضاف إلى الفاتورة مباشرة. باقي التفاصيل تُعدَّل لاحقاً من صفحة الأصناف.','The item is saved and added to this invoice. Other details can be edited later on the Items page.'],lineTotalHint:['اكتب الإجمالي ليُحسب السعر تلقائياً','Type the total and the price is worked out'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
+statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],logistics:['الاستلام والتسليم','Receiving & delivery'],receiving:['استلام الأصناف','Receive items'],recvReport:['تقرير استلام الفواتير','Receiving report'],recvSub:['أصناف فواتير الشراء بانتظار الاستلام — اضغط «استلام» عند وصول كل صنف','Purchase invoice items awaiting receipt — press “Receive” as each item arrives'],recvBtn:['استلام','Receive'],recvAll:['استلام الكل','Receive all'],recvDone:['مستلم','Received'],recvUndo:['إلغاء الاستلام','Undo receipt'],recvUndoQ:['إلغاء استلام هذا الصنف؟','Undo receipt of this item?'],recvAllQ:['تسجيل استلام كل أصناف الفاتورة؟','Mark every item on this invoice as received?'],rs_none:['بانتظار الاستلام','Awaiting receipt'],rs_open:['غير مكتملة','Not complete'],rs_part:['مسلم جزئياً','Partly received'],rs_full:['مكتملة','Complete'],recvStatus:['حالة الاستلام','Receipt status'],recvCol:['الاستلام','Receipt'],recvItems:['المستلم','Received'],lastRecv:['آخر استلام','Last received'],openInv:['عرض الفاتورة','View invoice'],noPending:['لا توجد فواتير بانتظار الاستلام','No invoices awaiting receipt'],recvSaved:['تم تسجيل الاستلام','Receipt recorded'],quickItem:['صنف جديد','New item'],quickItemSave:['حفظ وإضافة للفاتورة','Save & add to invoice'],quickItemHint:['يُحفظ الصنف ويُضاف إلى الفاتورة مباشرة. باقي التفاصيل تُعدَّل لاحقاً من صفحة الأصناف.','The item is saved and added to this invoice. Other details can be edited later on the Items page.'],lineTotalHint:['اكتب الإجمالي ليُحسب السعر تلقائياً','Type the total and the price is worked out'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
 custBalances:['أرصدة العملاء','Customer balances'],suppBalances:['أرصدة الموردين','Supplier balances'],
 items:['قائمة الأصناف','Items list'],itemForm:['إضافة صنف جديد','Add new item'],stockCount:['جرد المخزون','Stock count'],
 'doc-sale':['إضافة فاتورة مبيعات','New sales invoice'],'list-sale':['تقرير المبيعات','Sales report'],
@@ -957,6 +963,7 @@ const NAV=[
   {g:'inventory',icon:'box',items:['items','itemForm','stockCount']},
   {g:'sales',icon:'cart',items:['doc-sale','list-sale','doc-issue','list-issue','doc-salesReturn','list-salesReturn']},
   {g:'purchases',icon:'truck',items:['doc-purchase','list-purchase','doc-purchaseReturn','list-purchaseReturn']},
+  {g:'logistics',icon:'clip',items:['receiving','recvReport']},
   {g:'reports',icon:'chart',items:['dailyClose','profit','expenses','audit']},
   {k:'settings',icon:'gear'},
 ];
@@ -1166,9 +1173,9 @@ function docReport(type,d){
   const cfg=DOCS[type];const T=docTotals(d);const kind=cfg.party;const p=d.partyId?byId(partyCol(kind),d.partyId):null;
   const meta=[[t('no'),docNo(type,d)],[t('date'),d.date],[t(type==='issue'?'recipient':kind),partyName(kind,d)]];if(hasPM(type))meta.push([t('payMethod'),t('pm_'+pmOf(d))]);
   if(p&&p.phone)meta.push([t('phone'),p.phone]);if(p&&p.taxNo)meta.push([t('taxNo'),p.taxNo]);if(d.ref)meta.push([t('ref'),d.ref]);
-  const showTax=false;
-  const cols=[{h:'#'},{h:t('code')},{h:t('item')},{h:t('unit')},{h:t('qty'),n:1}];if(cfg.money)cols.push({h:t('price'),n:1});if(showTax)cols.push({h:t('taxCol')});if(cfg.money)cols.push({h:t('total'),n:1});
-  const rows=(d.lines||[]).map((l,i)=>{const r=[i+1,l.code||'',lName(l),l.unit||'',fq(l.qty)];if(cfg.money)r.push(fmt(l.price));if(showTax){const rt=lineRate(d,l);r.push(l.taxable===false?t('exempt'):rt?fq(rt)+'% '+(l.taxIncl?t('inclShort'):t('exclShort')):'—')}if(cfg.money)r.push(fmt(l.qty*l.price));return r});
+  const showTax=false;const showRecv=type==='purchase'&&d.id;if(showRecv)meta.push([t('recvStatus'),t('rs_'+recvStatus(d))]);
+  const cols=[{h:'#'},{h:t('code')},{h:t('item')},{h:t('unit')},{h:t('qty'),n:1}];if(cfg.money)cols.push({h:t('price'),n:1});if(showTax)cols.push({h:t('taxCol')});if(cfg.money)cols.push({h:t('total'),n:1});if(showRecv)cols.push({h:t('recvCol')});
+  const rows=(d.lines||[]).map((l,i)=>{const r=[i+1,l.code||'',lName(l),l.unit||'',fq(l.qty)];if(cfg.money)r.push(fmt(l.price));if(showTax){const rt=lineRate(d,l);r.push(l.taxable===false?t('exempt'):rt?fq(rt)+'% '+(l.taxIncl?t('inclShort'):t('exclShort')):'—')}if(cfg.money)r.push(fmt(l.qty*l.price));if(showRecv)r.push(l.recvAt?'✓ '+t('recvDone'):'—');return r});
   const rates=[...new Set((d.lines||[]).map(l=>lineRate(d,l)).filter(Boolean))];
   const totals=[];
   if(cfg.money){totals.push([t('subNet'),money(T.sub)]);if(T.disc)totals.push([t('discount'),money(T.disc)]);if(T.tax)totals.push([t('tax')+(rates.length===1?' ('+fq(rates[0])+'%)':''),money(T.tax)]);
@@ -1365,7 +1372,7 @@ function updateDocTotals(){paintDocHero();const d=S.draft;if(!d)return;const cfg
   if(paidLocked(d)){const p=$('[data-f="paid"]');if(p)p.value=fx(T.total);set('tRem',fmt(0))}else set('tRem',fmt(T.rem));}
 async function saveDoc(print){
   const d=S.draft;const type=d.type;const cfg=DOCS[type];
-  const lines=d.lines.filter(l=>l.itemId&&+l.qty>0).map(l=>{const it=byId('items',l.itemId)||{};return {itemId:l.itemId,code:it.code||'',name:it.name||'',nameEn:it.nameEn||'',unit:l.unit||it.unit||'',factor:+l.factor||1,qty:+l.qty,price:cfg.money?(+l.price||0):0,...(l.taxable!==undefined?{taxable:l.taxable!==false,taxRate:+l.taxRate||0,taxIncl:!!l.taxIncl}:{})}});
+  const lines=d.lines.filter(l=>l.itemId&&+l.qty>0).map(l=>{const it=byId('items',l.itemId)||{};return {itemId:l.itemId,code:it.code||'',name:it.name||'',nameEn:it.nameEn||'',unit:l.unit||it.unit||'',factor:+l.factor||1,qty:+l.qty,price:cfg.money?(+l.price||0):0,...(l.taxable!==undefined?{taxable:l.taxable!==false,taxRate:+l.taxRate||0,taxIncl:!!l.taxIncl}:{}),...(l.recvAt?{recvAt:l.recvAt,recvBy:l.recvBy||''}:{})}});
   if(!lines.length)return toast(t('needLines'),'err');
   if(!d.date)return toast(t('fillReq'),'err');
   if(hasPM(type)){if(!d.payMethod){S.payErr=true;render();const b=$('#payBox');b&&b.scrollIntoView({block:'center',behavior:'smooth'});return toast(t('needPay'),'err')}
@@ -1794,7 +1801,7 @@ function userForm(uname){
 }
 
 /* ===================== roles & first admin ===================== */
-const STAFF_OK=new Set(['dashboard','doc-sale','list-sale','doc-issue','list-issue','doc-salesReturn','list-salesReturn','receipt','customers','custBalances','statement','items','dailyClose','settings']);
+const STAFF_OK=new Set(['dashboard','doc-sale','list-sale','doc-issue','list-issue','doc-salesReturn','list-salesReturn','receipt','customers','custBalances','statement','items','dailyClose','settings','receiving','recvReport']);
 function isOwner(){return !!(S.user&&S.user.role==='owner')}
 function isAdmin(){return !!(S.user&&(S.user.role==='admin'||S.user.role==='owner'))}
 const visibleUsers=()=>(settings().users||[]).filter(u=>u.role!=='owner'||(S.user&&S.user.u===u.u));
@@ -1920,6 +1927,42 @@ function expReport(){const f=getF('exp',{cat:''});const L=expenseRows(f).filter(
     tables:[{caption:t('byCategory'),cols:[{h:t('category')},{h:t('amount'),n:1}],rows:bc.map(([c,v])=>[c,fmt(v)])},{cols:[{h:t('no')},{h:t('date')},{h:t('category')},{h:t('paidTo')},{h:t('method')},{h:t('notes')},{h:t('amount'),n:1}],rows:L.map(v=>['PV-'+pad(v.no),v.date,v.category||'',v.partyName||'',t(v.method),v.notes||'',fmt(v.amount)])}],
     totals:[[t('expTotal'),money(L.reduce((s,v)=>s+(+v.amount||0),0)),1]],sign:false});}
 
+/* ===================== receiving ===================== */
+const recvLines=d=>(d.lines||[]).filter(l=>l.itemId);
+function recvStatus(d){const L=recvLines(d);const r=L.filter(l=>l.recvAt).length;return !L.length||r===0?'none':r===L.length?'full':'part'}
+const recvChip=d=>{const st=recvStatus(d);const L=recvLines(d);return `<span class="rs rs-${st}">${t('rs_'+st)} · ${L.filter(l=>l.recvAt).length}/${L.length}</span>`};
+const recvWhen=iso=>{if(!iso)return '';const x=new Date(iso);return x.getFullYear()+'-'+pad(x.getMonth()+1,2)+'-'+pad(x.getDate(),2)+' '+pad(x.getHours(),2)+':'+pad(x.getMinutes(),2)};
+async function setRecv(id,idxs,on){const d=byId('purchases',id);if(!d)return;const rec=clone(d);const now=new Date().toISOString();
+  idxs.forEach(i=>{const l=rec.lines[i];if(!l)return;if(on){if(!l.recvAt){l.recvAt=now;l.recvBy=S.user?(S.user.name||S.user.u):''}}else{delete l.recvAt;delete l.recvBy}});
+  try{await Store.save('purchases',rec)}catch(e){return}toast(on?t('recvSaved'):t('recvUndo'),'ok');render()}
+function recvFilter(f){return S.data.purchases.filter(d=>inRange(d.date,f)&&(!f.party||d.partyId===f.party)&&(!f.st||(f.st==='open'?recvStatus(d)!=='full':recvStatus(d)===f.st))&&(!f.q||docNo('purchase',d).toLowerCase().includes(String(f.q).trim().toLowerCase()))).sort((a,b)=>b.date.localeCompare(a.date)||(b.no||0)-(a.no||0))}
+PAGES.receiving={html(){const f=getF('recv',{st:'open',party:'',q:'',from:'2000-01-01'});const L=recvFilter(f);
+  const card=d=>{const st=recvStatus(d);const lines=d.lines||[];
+    return `<div class="card recv-card rc-${st}"><div class="between" style="gap:8px;flex-wrap:wrap"><div><b>${h(docNo('purchase',d))}</b> <span class="muted small">· ${h(d.date)}</span><div class="small">${h(partyName('supplier',d))}</div></div><div class="row" style="gap:6px">${recvChip(d)}</div></div>
+    <div class="recv-lines">${lines.map((l,i)=>l.itemId?`<div class="recv-ln ${l.recvAt?'ok':''}"><div class="rl-main"><b>${h(lName(l))}</b><span class="muted small">${h(l.code||'')} · ${fq(l.qty)} ${h(l.unit||'')}</span>${l.recvAt?`<span class="small pos">✓ ${t('recvDone')} · ${h(recvWhen(l.recvAt))}${l.recvBy?' · '+h(l.recvBy):''}</span>`:''}</div>
+      ${l.recvAt?(isAdmin()?`<button class="btn sm ghost" data-act="recvUndo" data-id="${d.id}" data-i="${i}">${t('recvUndo')}</button>`:`<span class="rs rs-full">✓</span>`):`<button class="btn sm primary" data-act="recvLine" data-id="${d.id}" data-i="${i}">${ic('check')}${t('recvBtn')}</button>`}</div>`:'').join('')}</div>
+    <div class="row end" style="margin-top:10px;gap:8px">${canSee('list-purchase')?`<button class="btn sm" data-act="recvOpen" data-id="${d.id}">${ic('eye')}${t('openInv')}</button>`:''}${st!=='full'?`<button class="btn sm primary" data-act="recvAllBtn" data-id="${d.id}">${ic('check')}${t('recvAll')}</button>`:''}</div></div>`};
+  return `<div class="pg-head"><div><h2>${t('receiving')}</h2><p>${t('recvSub')}</p></div><div class="row"><button class="btn" data-go="recvReport">${ic('file')}${t('recvReport')}</button></div></div>
+  <div class="card"><div class="grid g4 v-f">
+   ${fld(t('recvStatus'),`<select data-filter="recv:st">${opt('open',t('rs_open'),f.st)}${opt('part',t('rs_part'),f.st)}${opt('none',t('rs_none'),f.st)}${opt('full',t('rs_full'),f.st)}${opt('',t('all'),f.st)}</select>`)}
+   ${fld(t('supplier'),`<select data-filter="recv:party">${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
+   ${fld(t('from'),`<input type="date" data-filter="recv:from" value="${h(f.from==='2000-01-01'?'':f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="recv:to" value="${h(f.to)}">`)}</div></div>
+  ${L.length?L.map(card).join(''):`<div class="card"><div class="empty">${f.st==='open'?t('noPending'):t('noData')}</div></div>`}`;}};
+function recvReportData(){const f=getF('recvR',{st:'',party:''});const L=recvFilter(f);const c={none:0,part:0,full:0};L.forEach(d=>c[recvStatus(d)]++);return {f,L,c}}
+PAGES.recvReport={html(){const {f,L,c}=recvReportData();
+  const last=d=>recvLines(d).map(l=>l.recvAt||'').sort().pop()||'';
+  return `<div class="pg-head"><div><h2>${t('recvReport')}</h2><p>${h(perTxt(f))}</p></div><div class="row"><button class="btn" data-go="receiving">${ic('check')}${t('receiving')}</button><button class="btn primary" data-act="recvPdf">${ic('pdf')}${t('pdf')}</button></div></div>
+  <div class="card"><div class="grid g4 v-f" style="margin-bottom:14px">${fld(t('from'),`<input type="date" data-filter="recvR:from" value="${h(f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="recvR:to" value="${h(f.to)}">`)}
+   ${fld(t('supplier'),`<select data-filter="recvR:party">${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
+   ${fld(t('recvStatus'),`<select data-filter="recvR:st">${opt('',t('all'),f.st)}${opt('none',t('rs_none'),f.st)}${opt('part',t('rs_part'),f.st)}${opt('full',t('rs_full'),f.st)}</select>`)}</div>
+  <div class="kpi-row"><div class="hl"><span>${t('count')}</span><b>${L.length}</b></div><div><span class="rs rs-full">${t('rs_full')}</span><b>${c.full}</b></div><div><span class="rs rs-part">${t('rs_part')}</span><b>${c.part}</b></div><div><span class="rs rs-none">${t('rs_none')}</span><b>${c.none}</b></div></div>
+  ${L.length?`<div class="tbl-wrap"><table class="t"><thead><tr><th>${t('no')}</th><th>${t('date')}</th><th>${t('supplier')}</th><th class="n">${t('recvItems')}</th><th>${t('recvStatus')}</th><th>${t('lastRecv')}</th></tr></thead><tbody>
+   ${L.map(d=>`<tr class="click" data-act="recvOpen" data-id="${d.id}"><td><b>${h(docNo('purchase',d))}</b></td><td>${h(d.date)}</td><td>${h(partyName('supplier',d))}</td><td class="n">${recvLines(d).filter(l=>l.recvAt).length}/${recvLines(d).length}</td><td>${recvChip(d)}</td><td class="muted small">${h(recvWhen(last(d)))}</td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">${t('noData')}</div>`}</div>`;}};
+function recvReportHtml(){const {f,L,c}=recvReportData();
+  return repHtml({title:t('recvReport'),meta:[[t('period'),perTxt(f)],[t('supplier'),f.party?((byId('suppliers',f.party)||{}).name||''):t('all')],[t('count'),L.length]],
+    tables:[{cols:[{h:t('no')},{h:t('date')},{h:t('supplier')},{h:t('recvItems'),n:1},{h:t('recvStatus')},{h:t('lastRecv')}],rows:L.map(d=>[docNo('purchase',d),d.date,partyName('supplier',d),recvLines(d).filter(l=>l.recvAt).length+'/'+recvLines(d).length,t('rs_'+recvStatus(d)),recvWhen(recvLines(d).map(l=>l.recvAt||'').sort().pop()||'')])}],
+    totals:[[t('rs_full'),String(c.full)],[t('rs_part'),String(c.part)],[t('rs_none'),String(c.none),1]],sign:false})}
+
 /* ===================== day close ===================== */
 function dayData(date){const f={from:date,to:date};const byPm={};PM.forEach(m=>byPm[m]={n:0,t:0});
   S.data.sales.filter(d=>d.date===date).forEach(d=>{const m=pmOf(d);byPm[m].n++;byPm[m].t+=docTotals(d).total});
@@ -2017,6 +2060,11 @@ const ACT={
   addLine(){S.draft.lines.push({itemId:'',unit:'',factor:1,qty:1,price:0});render();const sel=$$('[data-l$=":itemId"]').pop();sel&&sel.focus()},
   rmLine(el){S.draft.lines.splice(+el.dataset.i,1);render()},
   quickItem(){quickItemForm()},
+  recvLine(el){setRecv(el.dataset.id,[+el.dataset.i],true)},
+  async recvAllBtn(el){const d=byId('purchases',el.dataset.id);if(!d)return;if(!await confirmDlg(t('recvAllQ')))return;setRecv(d.id,(d.lines||[]).map((l,i)=>l.itemId&&!l.recvAt?i:-1).filter(i=>i>=0),true)},
+  async recvUndo(el){if(!isAdmin())return;if(!await confirmDlg(t('recvUndoQ'),1))return;setRecv(el.dataset.id,[+el.dataset.i],false)},
+  recvOpen(el){const d=byId('purchases',el.dataset.id);if(d)openDoc('purchase',d)},
+  recvPdf(){openPreview({title:t('recvReport'),html:recvReportHtml(),filename:t('recvReport')+' '+today()})},
   payFull(){const T=docTotals(S.draft);S.draft.paid=T.total;const p=$('[data-f="paid"]');if(p)p.value=fx(T.total);updateDocTotals()},
   saveDoc(el){saveDoc(!!el.dataset.print)},
   openDoc(el){const type=el.dataset.type;const d=byId(DOCS[type].col,el.dataset.id);if(d)openDoc(type,d)},
