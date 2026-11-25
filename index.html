@@ -158,6 +158,15 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .pm-credit.on{background:var(--g-gold);color:#2a1f05}
 .dash-acts{flex-wrap:wrap;gap:8px}
 .chart-f{margin:10px 0 6px}
+.ss-wrap{position:relative;flex:1;min-width:0}.ss-native{display:none!important}
+.ss-in{width:100%;padding-inline-end:34px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364716e' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center}
+[dir=ltr] .ss-in{background-position:right 12px center}
+.ss-in.need{border-color:#d33!important;box-shadow:0 0 0 3px #d3333322}
+.ss-list{display:none;position:absolute;inset-inline:0;top:calc(100% + 4px);z-index:60;max-height:280px;overflow:auto;background:#fff;border:1px solid var(--line,#e3e6ea);border-radius:14px;box-shadow:0 14px 34px rgba(10,20,50,.18);padding:4px}
+.ss-wrap.open .ss-list{display:block}
+.ss-it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:15px}
+.ss-it small{color:#7a8490;font-size:12px}.ss-it.act,.ss-it:hover{background:var(--pri-soft,#e8edf8)}.ss-it.on{font-weight:700}
+.ss-none{padding:12px;color:#7a8490;text-align:center;font-size:14px}
 .rs{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
 .rs-none{background:#eef0f3;color:#5b6472}.rs-part{background:#fff1e0;color:#c25e00}.rs-full{background:#e3f6ea;color:#1a7f4b}
 .recv-card{border-inline-start:5px solid #c9ced6}.recv-card.rc-part{border-inline-start-color:#f08a1c}.recv-card.rc-full{border-inline-start-color:#22a35a}
@@ -632,7 +641,7 @@ wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيح�
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
 logout:['خروج','Sign out'],hello:['مرحباً','Welcome'],hideMenu:['إخفاء القائمة','Hide menu'],showMenu:['إظهار القائمة','Show menu'],lang:['English','العربية'],
 dashboard:['لوحة التحكم','Dashboard'],accounts:['الحسابات','Accounts'],inventory:['المخزون','Inventory'],sales:['المبيعات','Sales'],purchases:['المشتريات','Purchases'],settings:['الإعدادات','Settings'],
-statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],logistics:['الاستلام والتسليم','Receiving & delivery'],receiving:['استلام الأصناف','Receive items'],recvReport:['تقرير استلام الفواتير','Receiving report'],recvSub:['أصناف فواتير الشراء بانتظار الاستلام — اضغط «استلام» عند وصول كل صنف','Purchase invoice items awaiting receipt — press “Receive” as each item arrives'],recvBtn:['استلام','Receive'],recvAll:['استلام الكل','Receive all'],recvDone:['مستلم','Received'],recvUndo:['إلغاء الاستلام','Undo receipt'],recvUndoQ:['إلغاء استلام هذا الصنف؟','Undo receipt of this item?'],recvAllQ:['تسجيل استلام كل أصناف الفاتورة؟','Mark every item on this invoice as received?'],rs_none:['بانتظار الاستلام','Awaiting receipt'],rs_open:['غير مكتملة','Not complete'],rs_part:['مسلم جزئياً','Partly received'],rs_full:['مكتملة','Complete'],recvStatus:['حالة الاستلام','Receipt status'],recvCol:['الاستلام','Receipt'],recvItems:['المستلم','Received'],lastRecv:['آخر استلام','Last received'],openInv:['عرض الفاتورة','View invoice'],noPending:['لا توجد فواتير بانتظار الاستلام','No invoices awaiting receipt'],recvSaved:['تم تسجيل الاستلام','Receipt recorded'],quickItem:['صنف جديد','New item'],quickItemSave:['حفظ وإضافة للفاتورة','Save & add to invoice'],quickItemHint:['يُحفظ الصنف ويُضاف إلى الفاتورة مباشرة. باقي التفاصيل تُعدَّل لاحقاً من صفحة الأصناف.','The item is saved and added to this invoice. Other details can be edited later on the Items page.'],lineTotalHint:['اكتب الإجمالي ليُحسب السعر تلقائياً','Type the total and the price is worked out'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
+statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],searchPartyPh:['ابحث بالاسم أو الهاتف…','Search by name or phone…'],noResults:['لا توجد نتائج','No results'],logistics:['الاستلام والتسليم','Receiving & delivery'],receiving:['استلام الأصناف','Receive items'],recvReport:['تقرير استلام الفواتير','Receiving report'],recvSub:['أصناف فواتير الشراء بانتظار الاستلام — اضغط «استلام» عند وصول كل صنف','Purchase invoice items awaiting receipt — press “Receive” as each item arrives'],recvBtn:['استلام','Receive'],recvAll:['استلام الكل','Receive all'],recvDone:['مستلم','Received'],recvUndo:['إلغاء الاستلام','Undo receipt'],recvUndoQ:['إلغاء استلام هذا الصنف؟','Undo receipt of this item?'],recvAllQ:['تسجيل استلام كل أصناف الفاتورة؟','Mark every item on this invoice as received?'],rs_none:['بانتظار الاستلام','Awaiting receipt'],rs_open:['غير مكتملة','Not complete'],rs_part:['مسلم جزئياً','Partly received'],rs_full:['مكتملة','Complete'],recvStatus:['حالة الاستلام','Receipt status'],recvCol:['الاستلام','Receipt'],recvItems:['المستلم','Received'],lastRecv:['آخر استلام','Last received'],openInv:['عرض الفاتورة','View invoice'],noPending:['لا توجد فواتير بانتظار الاستلام','No invoices awaiting receipt'],recvSaved:['تم تسجيل الاستلام','Receipt recorded'],quickItem:['صنف جديد','New item'],quickItemSave:['حفظ وإضافة للفاتورة','Save & add to invoice'],quickItemHint:['يُحفظ الصنف ويُضاف إلى الفاتورة مباشرة. باقي التفاصيل تُعدَّل لاحقاً من صفحة الأصناف.','The item is saved and added to this invoice. Other details can be edited later on the Items page.'],lineTotalHint:['اكتب الإجمالي ليُحسب السعر تلقائياً','Type the total and the price is worked out'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
 custBalances:['أرصدة العملاء','Customer balances'],suppBalances:['أرصدة الموردين','Supplier balances'],
 items:['قائمة الأصناف','Items list'],itemForm:['إضافة صنف جديد','Add new item'],stockCount:['جرد المخزون','Stock count'],
 'doc-sale':['إضافة فاتورة مبيعات','New sales invoice'],'list-sale':['تقرير المبيعات','Sales report'],
@@ -1278,7 +1287,7 @@ PAGES.doc={html(){
   ${sec('file',t('docData'),`<div class="grid g4">
     ${fld(t('no'),`<div class="code-box"><input readonly dir="ltr" value="${docNo(type,d)}"></div>`)}
     ${fld(t('date'),`<input type="date" data-f="date" value="${h(d.date)}">`,1)}
-    ${fld(t(type==='issue'?'recipient':cfg.party),`<div class="row" style="flex-wrap:nowrap;gap:6px"><select data-f="partyId">${partyOpts(cfg.party,d.partyId,emptyLabel)}</select><button type="button" class="btn icon primary acc-btn" data-act="quickParty" data-kind="${cfg.party}" title="${t(cfg.party==='customer'?'newCustomer':'newSupplier')}">${ic('plus')}</button></div>`)}
+    ${fld(t(type==='issue'?'recipient':cfg.party),`<div class="row" style="flex-wrap:nowrap;gap:6px"><select data-f="partyId" data-search>${partyOpts(cfg.party,d.partyId,emptyLabel)}</select><button type="button" class="btn icon primary acc-btn" data-act="quickParty" data-kind="${cfg.party}" title="${t(cfg.party==='customer'?'newCustomer':'newSupplier')}">${ic('plus')}</button></div>`)}
     ${!d.partyId?fld(t('nameOptional'),`<input data-f="partyName" value="${h(d.partyName)}">`):(type==='salesReturn'||type==='purchaseReturn'?fld(t('ref'),`<input data-f="ref" value="${h(d.ref)}">`):fld(t('phone'),`<input readonly dir="ltr" value="${h((byId(partyCol(cfg.party),d.partyId)||{}).phone||'')}">`))}
   </div>
   ${!d.partyId&&(type==='salesReturn'||type==='purchaseReturn')?`<div class="grid g4" style="margin-top:14px">${fld(t('ref'),`<input data-f="ref" value="${h(d.ref)}">`)}</div>`:''}
@@ -1376,7 +1385,7 @@ async function saveDoc(print){
   if(!lines.length)return toast(t('needLines'),'err');
   if(!d.date)return toast(t('fillReq'),'err');
   if(hasPM(type)){if(!d.payMethod){S.payErr=true;render();const b=$('#payBox');b&&b.scrollIntoView({block:'center',behavior:'smooth'});return toast(t('needPay'),'err')}
-    if(d.payMethod==='credit'&&!d.partyId){const sel=$('[data-f="partyId"]');if(sel){sel.focus();sel.scrollIntoView({block:'center',behavior:'smooth'});sel.classList.add('need')}return toast(t(type==='purchase'?'creditNeedsSupplier':'creditNeedsCustomer'),'err')}}
+    if(d.payMethod==='credit'&&!d.partyId){markNeed($('[data-f="partyId"]'));return toast(t(type==='purchase'?'creditNeedsSupplier':'creditNeedsCustomer'),'err')}}
   if(cfg.stock<0){const st=stockMap();const orig=d.id?(S.data[cfg.col].find(x=>x.id===d.id)||{lines:[]}):{lines:[]};const need={};lines.forEach(l=>need[l.itemId]=(need[l.itemId]||0)+l.qty*l.factor);
     const short=Object.entries(need).filter(([id,q])=>{let a=st[id]||0;orig.lines.forEach(l=>{if(l.itemId===id)a+=(+l.qty||0)*(+l.factor||1)});return q>a+1e-9}).map(([id,q])=>{const it=byId('items',id);let a=st[id]||0;orig.lines.forEach(l=>{if(l.itemId===id)a+=(+l.qty||0)*(+l.factor||1)});return `• ${it?iName(it):id}: ${fq(q)} / ${fq(a)} ${it?it.unit:''}`});
     if(short.length&&settings().blockNeg){await confirmDlg(t('stockBlocked')+'\n'+short.join('\n'));return}
@@ -1403,7 +1412,7 @@ PAGES.list={html(){
    <div class="row"><button class="btn primary" data-go="doc-${type}">${ic('plus')}${t('doc-'+type)}</button><button class="btn" data-act="listPdf" data-type="${type}">${ic('pdf')}${t('pdf')}</button><button class="btn wa" data-act="listPdf" data-type="${type}">${ic('wa')}${t('whatsapp')}</button></div></div>
   <div class="card"><div class="grid g4" style="margin-bottom:16px">
     ${fld(t('from'),`<input type="date" data-filter="l-${type}:from" value="${h(f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="l-${type}:to" value="${h(f.to)}">`)}
-    ${fld(t(cfg.party),`<select data-filter="l-${type}:party">${opt('',t('all'),f.party)}${partyOpts(cfg.party,f.party)}</select>`)}${fld(t('search').replace('…',''),`<input data-filter="l-${type}:q" value="${h(f.q)}" placeholder="${t('search')}">`)}
+    ${fld(t(cfg.party),`<select data-filter="l-${type}:party" data-search>${opt('',t('all'),f.party)}${partyOpts(cfg.party,f.party)}</select>`)}${fld(t('search').replace('…',''),`<input data-filter="l-${type}:q" value="${h(f.q)}" placeholder="${t('search')}">`)}
     ${type==='sale'?fld(t('payMethod'),`<select data-filter="l-${type}:pm">${opt('',t('all'),f.pm||'')}${PM.map(m=>opt(m,t('pm_'+m),f.pm||'')).join('')}</select>`):''}
   </div>
   ${type==='sale'?`<div class="pm-sum">${PM.map(m=>`<div class="pm-card pm-${m}"><div class="ic">${ic(PM_IC[m])}</div><div><span>${t('pm_'+m)} · ${byPm[m].n} ${t('invCount')}</span><b>${money(byPm[m].t)}</b></div></div>`).join('')}</div>`:''}
@@ -1443,7 +1452,7 @@ function voucherPage(kind){
   <div class="card"><div class="grid g4">
     ${fld(t('date'),`<input type="date" data-v="date" value="${h(v.date)}">`,1)}
     ${fld(t('partyType'),`<select data-v="partyType">${opt('customer',t('customer'),v.partyType)}${opt('supplier',t('supplier'),v.partyType)}${opt('other',t('other'),v.partyType)}</select>`)}
-    ${v.partyType==='other'?fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<input data-v="partyName" value="${h(v.partyName)}">`,kind==='receipt'):fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<div class="row" style="flex-wrap:nowrap;gap:6px"><select data-v="partyId">${partyOpts(v.partyType,v.partyId,'—')}</select><button type="button" class="btn icon primary" data-act="quickParty" data-kind="${v.partyType}" title="${t(v.partyType==='customer'?'newCustomer':'newSupplier')}">${ic('plus')}</button></div>`,1)}
+    ${v.partyType==='other'?fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<input data-v="partyName" value="${h(v.partyName)}">`,kind==='receipt'):fld(t(kind==='receipt'?'receivedFrom':'paidTo'),`<div class="row" style="flex-wrap:nowrap;gap:6px"><select data-v="partyId" data-search>${partyOpts(v.partyType,v.partyId,'—')}</select><button type="button" class="btn icon primary" data-act="quickParty" data-kind="${v.partyType}" title="${t(v.partyType==='customer'?'newCustomer':'newSupplier')}">${ic('plus')}</button></div>`,1)}
     ${fld(t('amount'),`<input type="number" step="any" min="0" class="money" data-v="amount" value="${v.amount===''||v.amount==null?'':fx(v.amount)}" placeholder="${fx(0)}">`,1)}
     ${fld(t('method'),`<select data-v="method">${vmOpts(v.method).map(m=>opt(m,t(m),v.method||'cash')).join('')}</select>`)}
     ${kind==='payment'&&v.partyType==='other'?fld(t('category'),`<select data-v="category">${expCats().map(c=>opt(c,c,v.category||expCats()[0])).join('')}</select>`,1):''}
@@ -1569,7 +1578,7 @@ PAGES.statement={html(){
   ${st?`<div class="row"><button class="btn" data-act="stmtPdf">${ic('pdf')}${t('pdf')}</button><button class="btn wa" data-act="stmtPdf">${ic('wa')}${t('whatsapp')}</button></div>`:''}</div>
   <div class="card"><div class="grid g4">
    ${fld(t('kind'),`<div class="seg"><button class="${kind==='customer'?'on':''}" data-act="stmtKind" data-kind="customer">${t('customer')}</button><button class="${kind==='supplier'?'on':''}" data-act="stmtKind" data-kind="supplier">${t('supplier')}</button></div>`)}
-   ${fld(t('chooseParty'),`<select data-filter="stmt:party">${partyOpts(kind,f.party,'—')}</select>`,1)}
+   ${fld(t('chooseParty'),`<select data-filter="stmt:party" data-search>${partyOpts(kind,f.party,'—')}</select>`,1)}
    ${fld(t('from'),`<input type="date" data-filter="stmt:from" value="${h(f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="stmt:to" value="${h(f.to)}">`)}
   </div></div>
   ${st?`<div class="card"><div class="sum"><div><span>${t('prevBal')}</span><b>${fmt(st.prev)}</b></div><div><span>${t('debit')}</span><b>${fmt(st.td)}</b></div><div><span>${t('credit')}</span><b>${fmt(st.tc)}</b></div><div><span>${t('closingBal')}</span><b class="${st.close>0?'neg':st.close<0?'pos':''}">${money(st.close)}</b></div></div>
@@ -1927,6 +1936,33 @@ function expReport(){const f=getF('exp',{cat:''});const L=expenseRows(f).filter(
     tables:[{caption:t('byCategory'),cols:[{h:t('category')},{h:t('amount'),n:1}],rows:bc.map(([c,v])=>[c,fmt(v)])},{cols:[{h:t('no')},{h:t('date')},{h:t('category')},{h:t('paidTo')},{h:t('method')},{h:t('notes')},{h:t('amount'),n:1}],rows:L.map(v=>['PV-'+pad(v.no),v.date,v.category||'',v.partyName||'',t(v.method),v.notes||'',fmt(v.amount)])}],
     totals:[[t('expTotal'),money(L.reduce((s,v)=>s+(+v.amount||0),0)),1]],sign:false});}
 
+/* ===================== searchable selects ===================== */
+const normAr=x=>String(x||'').toLowerCase().replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
+function markNeed(sel){if(!sel)return;ssScan();const w=sel.closest('.ss-wrap');const tgt=w?w.querySelector('.ss-in'):sel;tgt.classList.add('need');tgt.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>tgt.focus(),250)}
+function partyPhone(id){const p=(S.data.customers||[]).find(x=>x.id===id)||(S.data.suppliers||[]).find(x=>x.id===id);return p?(p.phone||''):''}
+function enhanceSelect(sel){
+  if(sel.dataset.ssDone)return;sel.dataset.ssDone='1';
+  const w=document.createElement('div');w.className='ss-wrap';sel.parentNode.insertBefore(w,sel);w.appendChild(sel);sel.classList.add('ss-native');sel.tabIndex=-1;
+  const inp=document.createElement('input');inp.type='text';inp.className='ss-in';inp.autocomplete='off';inp.setAttribute('enterkeyhint','search');inp.placeholder=t('searchPartyPh');
+  const list=document.createElement('div');list.className='ss-list';w.appendChild(inp);w.appendChild(list);
+  const cur=()=>{const o=sel.options[sel.selectedIndex];return o?o.text:''};
+  inp.value=cur();let items=[],act=0;
+  const paint=q=>{const nq=normAr(q);items=[...sel.options].filter(o=>{if(!nq)return true;const ph=o.value?partyPhone(o.value):'';return normAr(o.text).includes(nq)||(ph&&ph.replace(/\D/g,'').includes(nq.replace(/\D/g,'')||'§'))});act=0;
+    list.innerHTML=items.length?items.slice(0,80).map((o,i)=>{const ph=o.value?partyPhone(o.value):'';return `<div class="ss-it${o.value===sel.value?' on':''}${i===act?' act':''}" data-i="${i}"><span>${h(o.text)}</span>${ph?`<small dir="ltr">${h(ph)}</small>`:''}</div>`}).join(''):`<div class="ss-none">${t('noResults')}</div>`};
+  const open=()=>{w.classList.add('open');paint(inp.value===cur()?'':inp.value)};
+  const close=()=>{w.classList.remove('open');inp.value=cur()};
+  const pick=o=>{if(!o)return;inp.classList.remove('need');sel.classList.remove('need');const changed=sel.value!==o.value;sel.value=o.value;inp.value=o.text;w.classList.remove('open');inp.blur();if(changed)sel.dispatchEvent(new Event('change',{bubbles:true}))};
+  inp.addEventListener('focus',()=>{inp.select();open()});
+  inp.addEventListener('input',e=>{e.stopPropagation();w.classList.add('open');paint(inp.value)});
+  inp.addEventListener('change',e=>e.stopPropagation());
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopPropagation();pick(items[act]||items[0])}else if(e.key==='Escape'){close();inp.blur()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();act=Math.max(0,Math.min(items.length-1,act+(e.key==='ArrowDown'?1:-1)));[...list.children].forEach((c,i)=>c.classList.toggle('act',i===act))}});
+  list.addEventListener('mousedown',e=>e.preventDefault());
+  list.addEventListener('click',e=>{const it=e.target.closest('.ss-it');if(it)pick(items[+it.dataset.i])});
+  inp.addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==inp)close()},150));
+}
+const ssScan=()=>$$('select[data-search]:not([data-ss-done])').forEach(enhanceSelect);
+new MutationObserver(()=>{if(!ssScan.q){ssScan.q=1;requestAnimationFrame(()=>{ssScan.q=0;ssScan()})}}).observe(document.documentElement,{childList:true,subtree:true});
+
 /* ===================== receiving ===================== */
 const recvLines=d=>(d.lines||[]).filter(l=>l.itemId);
 function recvStatus(d){const L=recvLines(d);const r=L.filter(l=>l.recvAt).length;return !L.length||r===0?'none':r===L.length?'full':'part'}
@@ -1945,7 +1981,7 @@ PAGES.receiving={html(){const f=getF('recv',{st:'open',party:'',q:'',from:'2000-
   return `<div class="pg-head"><div><h2>${t('receiving')}</h2><p>${t('recvSub')}</p></div><div class="row"><button class="btn" data-go="recvReport">${ic('file')}${t('recvReport')}</button></div></div>
   <div class="card"><div class="grid g4 v-f">
    ${fld(t('recvStatus'),`<select data-filter="recv:st">${opt('open',t('rs_open'),f.st)}${opt('part',t('rs_part'),f.st)}${opt('none',t('rs_none'),f.st)}${opt('full',t('rs_full'),f.st)}${opt('',t('all'),f.st)}</select>`)}
-   ${fld(t('supplier'),`<select data-filter="recv:party">${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
+   ${fld(t('supplier'),`<select data-filter="recv:party" data-search>${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
    ${fld(t('from'),`<input type="date" data-filter="recv:from" value="${h(f.from==='2000-01-01'?'':f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="recv:to" value="${h(f.to)}">`)}</div></div>
   ${L.length?L.map(card).join(''):`<div class="card"><div class="empty">${f.st==='open'?t('noPending'):t('noData')}</div></div>`}`;}};
 function recvReportData(){const f=getF('recvR',{st:'',party:''});const L=recvFilter(f);const c={none:0,part:0,full:0};L.forEach(d=>c[recvStatus(d)]++);return {f,L,c}}
@@ -1953,7 +1989,7 @@ PAGES.recvReport={html(){const {f,L,c}=recvReportData();
   const last=d=>recvLines(d).map(l=>l.recvAt||'').sort().pop()||'';
   return `<div class="pg-head"><div><h2>${t('recvReport')}</h2><p>${h(perTxt(f))}</p></div><div class="row"><button class="btn" data-go="receiving">${ic('check')}${t('receiving')}</button><button class="btn primary" data-act="recvPdf">${ic('pdf')}${t('pdf')}</button></div></div>
   <div class="card"><div class="grid g4 v-f" style="margin-bottom:14px">${fld(t('from'),`<input type="date" data-filter="recvR:from" value="${h(f.from)}">`)}${fld(t('to'),`<input type="date" data-filter="recvR:to" value="${h(f.to)}">`)}
-   ${fld(t('supplier'),`<select data-filter="recvR:party">${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
+   ${fld(t('supplier'),`<select data-filter="recvR:party" data-search>${opt('',t('all'),f.party)}${partyOpts('supplier',f.party)}</select>`)}
    ${fld(t('recvStatus'),`<select data-filter="recvR:st">${opt('',t('all'),f.st)}${opt('none',t('rs_none'),f.st)}${opt('part',t('rs_part'),f.st)}${opt('full',t('rs_full'),f.st)}</select>`)}</div>
   <div class="kpi-row"><div class="hl"><span>${t('count')}</span><b>${L.length}</b></div><div><span class="rs rs-full">${t('rs_full')}</span><b>${c.full}</b></div><div><span class="rs rs-part">${t('rs_part')}</span><b>${c.part}</b></div><div><span class="rs rs-none">${t('rs_none')}</span><b>${c.none}</b></div></div>
   ${L.length?`<div class="tbl-wrap"><table class="t"><thead><tr><th>${t('no')}</th><th>${t('date')}</th><th>${t('supplier')}</th><th class="n">${t('recvItems')}</th><th>${t('recvStatus')}</th><th>${t('lastRecv')}</th></tr></thead><tbody>
@@ -2101,7 +2137,7 @@ const ACT={
         if(alsoNew){const cur0=clone(S.data.settings.find(x=>x.id==='main')||Object.assign({id:'main'},DEF));cur0.itemTaxable=taxable;await Store.save('settings',cur0)}
         S.noLog=false;closeModal();toast(t('bulkDone'),'ok');render()}catch(e){S.noLog=false;$$('[data-bulk]').forEach(x=>x.disabled=false)}})},
   removeLogo(){S.logoDraft='';paintLogo()},
-  setPay(el){const d=S.draft;if(!d)return;const m=el.dataset.m;const was=d.payMethod;d.payMethod=m;S.payErr=false;if(m==='credit'&&was!=='credit')d.paid=0;render();if(m==='credit'&&!d.partyId){const sel=$('[data-f="partyId"]');if(sel){sel.classList.add('need');sel.focus();sel.scrollIntoView({block:'center',behavior:'smooth'})}}},
+  setPay(el){const d=S.draft;if(!d)return;const m=el.dataset.m;const was=d.payMethod;d.payMethod=m;S.payErr=false;if(m==='credit'&&was!=='credit')d.paid=0;render();if(m==='credit'&&!d.partyId)markNeed($('[data-f="partyId"]'))},
   translateNow(){autoTranslate(true)},
   addSearchItem(el){addItemToDraft(el.dataset.id,el.dataset.unit)},
   newCode(){S.itemDraft.code=nextItemCode();render()},
