@@ -1506,6 +1506,12 @@ function partyForm(kind,id,onSaved){
   setTimeout(()=>{const n=$('#pForm [name=name]');n&&n.focus()},30);
 }
 
+function unitTileHtml(d,u,i){return `<div class="utile"><div class="utile-h"><span class="utag">${t('unitName')} ${i+2}</span><button type="button" class="btn icon ghost sm" data-act="rmUnit" data-i="${i}" title="${t('del')}">${ic('trash')}</button></div>
+    <div class="ugrid">${fld(t('unitName'),`<input data-iu="${i}:name" list="unitsDl" value="${h(u.name)}" placeholder="${isAr()?'كرتون':'carton'}">`)}
+    ${fld(t('factor'),`<div class="inp-suf"><input type="number" step="any" min="0" data-iu="${i}:factor" value="${h(u.factor)}" placeholder="12"><em>${h(d.unit)}</em></div>`)}
+    ${fld(t('salePrice'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:price" value="${u.price===''?'':fx(u.price)}" placeholder="${fx(0)}">`)}
+    ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:cost" value="${u.cost===''?'':fx(u.cost)}" placeholder="${fx(0)}">`)}</div></div>`}
+const qiUnitsHtml=()=>{const d=S.itemDraft;return d?d.units.map((u,i)=>unitTileHtml(d,u,i)).join('')+`<button type="button" class="add-tile" data-act="addUnit">${ic('plus')}<span>${t('addUnit')}</span></button>`:''};
 function quickItemForm(){
   const sq=($('#itemSearch')||{}).value||'';const ar=/[\u0600-\u06FF]/.test(sq);
   S.itemDraft={id:'',code:nextItemCode(),name:ar?sq.trim():'',nameEn:!ar?sq.trim():'',unit:isAr()?'حبة':'pcs',price:0,cost:0,units:[],_quick:1};const d=S.itemDraft;
@@ -1513,15 +1519,18 @@ function quickItemForm(){
   openModal(`<div class="mh"><h3>${t('quickItem')}</h3><button class="btn icon ghost" data-act="close">✕</button></div><form id="qiForm"><div class="mb"><div class="grid g2">
    ${fld(t('nameAr'),`<input data-it="name" dir="rtl" required value="${h(d.name)}" placeholder="${isAr()?'خيار':'Cucumber'}"><div class="small tr-status" id="trStatus"></div>`,1)}
    ${fld(t('nameEn'),`<input data-it="nameEn" dir="ltr" value="${h(d.nameEn)}" placeholder="Cucumber"><div class="small tr-status" id="trStatusEn"></div>`)}
-   ${fld(t('unit'),`<input data-it="unit" list="qiUnits" required value="${h(d.unit)}"><datalist id="qiUnits">${unitList}</datalist>`,1)}
+   ${fld(t('baseUnit'),`<input data-it="unit" list="unitsDl" required value="${h(d.unit)}"><datalist id="unitsDl">${unitList}</datalist>`,1)}
    ${fld(t('code'),`<input value="${h(d.code)}" readonly dir="ltr">`)}
    ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-it="cost" inputmode="decimal" placeholder="${fx(0)}">`)}
    ${fld(t('salePrice'),`<input type="number" step="any" min="0" class="money" data-it="price" inputmode="decimal" placeholder="${fx(0)}">`)}
-  </div><p class="small muted" style="margin:10px 0 0">${t('quickItemHint')}</p></div><div class="mf"><button type="button" class="btn" data-act="close">${t('cancel')}</button><button class="btn primary">${ic('check')}${t('quickItemSave')}</button></div></form>`);
+  </div><div style="font-weight:700;margin:16px 0 8px">${t('otherUnits')}</div><div id="qiUnitBox">${qiUnitsHtml()}</div><div class="small muted" style="margin-top:6px">${t('factorHint')}</div>
+  <p class="small muted" style="margin:10px 0 0">${t('quickItemHint')}</p></div><div class="mf"><button type="button" class="btn" data-act="close">${t('cancel')}</button><button class="btn primary">${ic('check')}${t('quickItemSave')}</button></div></form>`);
   $('#qiForm').onsubmit=async e=>{e.preventDefault();const q=S.itemDraft;if(!q||!q._quick)return;
     const name=String(q.name||'').trim(),unit=String(q.unit||'').trim();if(!name||!unit)return toast(t('fillReq'),'err');
+    const units=q.units.filter(u=>String(u.name).trim()||String(u.factor).trim()).map(u=>({name:String(u.name).trim(),factor:+u.factor||0,price:+u.price||0,cost:+u.cost||0}));const names=[unit,...units.map(u=>u.name)];
+    if(units.some(u=>!u.name||!(u.factor>0))||new Set(names).size!==names.length)return toast(t('unitErr'),'err');
     if(S.data.items.some(x=>x.code===q.code))q.code=nextItemCode();const st=settings();
-    const rec={id:uid(),code:q.code,name,nameEn:String(q.nameEn||'').trim(),unit,price:+q.price||0,cost:+q.cost||0,units:[],minQty:0,openingQty:0,notes:'',taxable:st.itemTaxable!==false,taxRate:+st.taxRate||0,taxIncl:false,createdAt:Date.now()};
+    const rec={id:uid(),code:q.code,name,nameEn:String(q.nameEn||'').trim(),unit,price:+q.price||0,cost:+q.cost||0,units,minQty:0,openingQty:0,notes:'',taxable:st.itemTaxable!==false,taxRate:+st.taxRate||0,taxIncl:false,createdAt:Date.now()};
     const btn=e.target.querySelector('.btn.primary');btn.disabled=true;
     try{await Store.save('items',rec)}catch(err){btn.disabled=false;return}
     S.itemDraft=null;closeModal();toast(t('saved')+' — '+name,'ok');const si=$('#itemSearch');if(si)si.value='';addItemToDraft(rec.id)};
@@ -1593,11 +1602,7 @@ PAGES.itemForm={html(){
   const d=S.itemDraft;const unitList=(isAr()?['حبة','كرتون','درزن','كيس','كيلو','غرام','لتر','متر','علبة','طقم','باكيت','Box']:['pcs','carton','dozen','bag','kg','g','litre','m','box','set','pack','Box']).map(u=>`<option value="${u}">`).join('');
   const taxMode=!d.taxable?'exempt':(d.taxIncl==='1'?'incl':'excl');
   const sec=(cls,icn,title,body,extra='')=>`<section class="card fsec ${cls}"><div class="fsec-h"><span class="fsec-ic">${ic(icn)}</span><h3>${title}</h3>${extra}</div>${body}</section>`;
-  const utile=(u,i)=>`<div class="utile"><div class="utile-h"><span class="utag">${t('unitName')} ${i+2}</span><button type="button" class="btn icon ghost sm" data-act="rmUnit" data-i="${i}" title="${t('del')}">${ic('trash')}</button></div>
-    <div class="ugrid">${fld(t('unitName'),`<input data-iu="${i}:name" list="unitsDl" value="${h(u.name)}" placeholder="${isAr()?'كرتون':'carton'}">`)}
-    ${fld(t('factor'),`<div class="inp-suf"><input type="number" step="any" min="0" data-iu="${i}:factor" value="${h(u.factor)}" placeholder="12"><em>${h(d.unit)}</em></div>`)}
-    ${fld(t('salePrice'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:price" value="${u.price===''?'':fx(u.price)}" placeholder="${fx(0)}">`)}
-    ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:cost" value="${u.cost===''?'':fx(u.cost)}" placeholder="${fx(0)}">`)}</div></div>`;
+  const utile=(u,i)=>unitTileHtml(d,u,i);
   return `<div class="pg-head"><div><h2>${t(d.id?'editItem':'itemForm')}</h2><p>${t('itemFormSub')}</p></div><button class="btn" data-go="items">${ic('box')}${t('items')}</button></div>
   <div class="ipv" id="ipv">${itemPreviewHtml(d)}</div>
   <datalist id="unitsDl">${unitList}</datalist>
@@ -2027,8 +2032,8 @@ const ACT={
   itemsPdf(){openPreview({title:t('itemsReport'),html:itemsReport(),filename:t('itemsReport')+' '+today(),message:t('itemsReport')+' — '+today()})},
   itemEdit(el){if(!isAdmin())return toast(t('noPerm'),'err');S.editItem=el.dataset.id;go('itemForm',null,true)},
   itemView(el){const it=byId('items',el.dataset.id);if(it)openItem(it)},
-  addUnit(){S.itemDraft.units.push({name:'',factor:'',price:'',cost:''});render();const n=$$('[data-iu$=":name"]').pop();n&&n.focus()},
-  rmUnit(el){S.itemDraft.units.splice(+el.dataset.i,1);render()},
+  addUnit(){S.itemDraft.units.push({name:'',factor:'',price:'',cost:''});if(S.itemDraft._quick){const bx=$('#qiUnitBox');if(bx)bx.innerHTML=qiUnitsHtml()}else render();const n=$$('[data-iu$=":name"]').pop();n&&n.focus()},
+  rmUnit(el){S.itemDraft.units.splice(+el.dataset.i,1);if(S.itemDraft._quick){const bx=$('#qiUnitBox');if(bx)bx.innerHTML=qiUnitsHtml()}else render()},
   saveItem(){saveItem()},
   vClear(el){const F=getF(el.dataset.k);F.name='';F.amt='';F.method='';F.q='';F.from=monthStart();F.to=today();render()},
   async sbOut(){if(!S.user||!isAdmin())return;if(!await confirmDlg(t('sbOutConfirm'),1))return;try{const c=await SB.get();await c.auth.signOut()}catch(e){}location.reload()},
