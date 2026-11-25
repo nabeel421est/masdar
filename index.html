@@ -598,8 +598,8 @@ html,body{max-width:100%;overflow-x:hidden}
   .lines-t td[data-lbl]:before{content:attr(data-lbl);display:block;font-size:11.5px;color:var(--mute);font-weight:600;margin-bottom:3px}
   .lines-t .ln-no{display:none}
   .lines-t .ln-item{grid-column:1/-1}
-  .lines-t .ln-total{grid-column:1/3;text-align:start;font-weight:700;font-size:15px;align-self:center}
-  .lines-t .ln-total:before{display:inline!important;margin-inline-end:6px}
+  .lines-t .ln-total{grid-column:1/3;text-align:start;font-weight:700;align-self:center;width:auto!important}
+  .lines-t .ln-total input{font-weight:700}
   .lines-t .ln-del{grid-column:3;justify-self:end;align-self:center}
   .lines-t tr:has(td:nth-child(6)) .ln-del{grid-column:3}
   .totals{max-width:none}
@@ -626,7 +626,7 @@ wrongLogin:['اسم المستخدم أو كلمة المرور غير صحيح�
 feat1:['حسابات العملاء والموردين وكشوف الحساب','Customer & supplier accounts and statements'],feat2:['فواتير المبيعات والمشتريات والمرتجعات','Sales, purchases and returns'],feat3:['تقارير PDF ومشاركة عبر واتساب','PDF reports shared via WhatsApp'],
 logout:['خروج','Sign out'],hello:['مرحباً','Welcome'],hideMenu:['إخفاء القائمة','Hide menu'],showMenu:['إظهار القائمة','Show menu'],lang:['English','العربية'],
 dashboard:['لوحة التحكم','Dashboard'],accounts:['الحسابات','Accounts'],inventory:['المخزون','Inventory'],sales:['المبيعات','Sales'],purchases:['المشتريات','Purchases'],settings:['الإعدادات','Settings'],
-statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
+statement:['كشف حساب','Account statement'],payment:['سند صرف','Payment voucher'],clearFilters:['مسح الفلاتر','Clear filters'],quickItem:['صنف جديد','New item'],quickItemSave:['حفظ وإضافة للفاتورة','Save & add to invoice'],quickItemHint:['يُحفظ الصنف ويُضاف إلى الفاتورة مباشرة. باقي التفاصيل تُعدَّل لاحقاً من صفحة الأصناف.','The item is saved and added to this invoice. Other details can be edited later on the Items page.'],lineTotalHint:['اكتب الإجمالي ليُحسب السعر تلقائياً','Type the total and the price is worked out'],vSearchPh:['رقم السند أو ملاحظة','Voucher no. or note'],addPayment:['إضافة سند صرف','New payment voucher'],receipt:['سند قبض','Receipt voucher'],customers:['العملاء','Customers'],suppliers:['الموردين','Suppliers'],
 custBalances:['أرصدة العملاء','Customer balances'],suppBalances:['أرصدة الموردين','Supplier balances'],
 items:['قائمة الأصناف','Items list'],itemForm:['إضافة صنف جديد','Add new item'],stockCount:['جرد المخزون','Stock count'],
 'doc-sale':['إضافة فاتورة مبيعات','New sales invoice'],'list-sale':['تقرير المبيعات','Sales report'],
@@ -742,6 +742,11 @@ const itemMatch=(i,q)=>!q||(i.name||'').toLowerCase().includes(q)||(i.nameEn||''
 const partyCol=k=>k==='customer'?'customers':'suppliers';
 const docNo=(type,d)=>DOCS[type].prefix+'-'+pad(d.no||0);
 const PM=['cash','benefit','credit'];const PPM=['cash','benefit','transfer','credit'];const PM_IC={cash:'cash',benefit:'phone',transfer:'bank',credit:'clock'};
+const KEEP_DRAFT=['sale','purchase'];const draftsKey=()=>'masdar-drafts-'+(S.user?S.user.u:'');
+function loadDrafts(){try{return JSON.parse(localStorage.getItem(draftsKey())||'{}')||{}}catch(e){return {}}}
+function storeDrafts(D){try{localStorage.setItem(draftsKey(),JSON.stringify(D))}catch(e){}}
+function persistDraft(){const d=S.draft;if(!d||d.id||!KEEP_DRAFT.includes(d.type)||!S.user)return;const D=loadDrafts();if((d.lines||[]).some(l=>l.itemId))D[d.type]=d;else delete D[d.type];storeDrafts(D)}
+function dropDraft(type){const D=loadDrafts();if(D[type]){delete D[type];storeDrafts(D)}}
 const VM=['benefit','cash','transfer'];const vmOpts=cur=>VM.concat(cur&&!VM.includes(cur)?[cur]:[]);
 const hasPM=type=>type==='sale'||type==='purchase';const pmList=type=>type==='purchase'?PPM:PM;const NONCASH=['benefit','transfer'];
 function pmOf(d){return d.payMethod||(docTotals(d).rem>0.0005?'credit':'cash')}
@@ -959,6 +964,7 @@ const navKey=()=>S.route==='doc'?'doc-'+S.param:S.route==='list'?'list-'+S.param
 function go(key,param,keep){
   {const nk0=key==='doc'?'doc-'+param:key==='list'?'list-'+param:key;if(S.user&&!canSee(nk0)){toast(t('noPerm'),'err');return}}
   let route=key;if(key.startsWith('doc-')){route='doc';param=key.slice(4)}else if(key.startsWith('list-')){route='list';param=key.slice(5)}
+  if(S.route==='doc')persistDraft();
   if(route==='doc'&&!keep)S.draft=null;
   if(route==='itemForm'){if(!keep)S.editItem=null;S.itemDraft=null}
   if(route==='settings')S.logoDraft=undefined;
@@ -970,6 +976,7 @@ function groupOf(k){const g=NAV.find(n=>n.items&&n.items.includes(k));return g?g
 
 /* ===================== shell / render ===================== */
 function render(){
+  if(S.route==='doc')persistDraft();
   S.dirty=false;
   document.documentElement.lang=S.lang;document.documentElement.dir=isAr()?'rtl':'ltr';
   document.title=t('app')+' — '+t('tagline');
@@ -1244,7 +1251,7 @@ PAGES.dashboard={html(){
 /* ---- document form (sales / purchases / returns / issues) ---- */
 function newDraft(type){const cfg=DOCS[type];return {type,no:nextNo(cfg.col),date:today(),partyId:'',partyName:'',lines:[],discount:0,taxRate:cfg.money?(+settings().taxRate||0):0,taxOn:cfg.money?settings().taxOn!==false:false,paid:0,notes:'',ref:'',payMethod:''}}
 PAGES.doc={html(){
-  const type=S.param;const cfg=DOCS[type];if(!S.draft||S.draft.type!==type)S.draft=newDraft(type);const d=S.draft;const T=docTotals(d);const st=stockMap();
+  const type=S.param;const cfg=DOCS[type];if(!S.draft||S.draft.type!==type){const kd=KEEP_DRAFT.includes(type)?loadDrafts()[type]:null;S.draft=kd&&!kd.id&&Array.isArray(kd.lines)?Object.assign(kd,{type,no:nextNo(cfg.col)}):newDraft(type)}const d=S.draft;const T=docTotals(d);const st=stockMap();
   const orig=d.id?(S.data[cfg.col].find(x=>x.id===d.id)||{lines:[]}):{lines:[]};
   const bq=l=>(+l.qty||0)*(+l.factor||1);const availOf=id=>{let a=st[id]||0;orig.lines.forEach(l=>{if(l.itemId===id)a+=cfg.stock<0?bq(l):-bq(l)});return a};
   const items=S.data.items.slice().sort((a,b)=>iName(a).localeCompare(iName(b)));
@@ -1254,7 +1261,7 @@ PAGES.doc={html(){
     ${it?`<div class="small muted">${t('avail')}: <b class="${av-(cfg.stock<0?bq(l):0)<0?'neg':''}">${fq(av)}</b> ${h(it.unit||'')}</div>`:''}</td>
     <td style="width:150px" data-lbl="${t('unit')}">${it?`<select data-l="${i}:unit">${itemUnits(it).map(u=>opt(u.name,u.name+(u.factor!==1?' ×'+fq(u.factor):''),l.unit||it.unit)).join('')}</select>`:''}</td>
     <td style="width:110px" data-lbl="${t('qty')}"><input type="number" step="any" min="0" data-l="${i}:qty" value="${h(l.qty)}" inputmode="decimal" enterkeyhint="next"></td>
-    ${cfg.money?`<td style="width:130px" data-lbl="${t('price')}"><input type="number" step="any" min="0" class="money" data-l="${i}:price" value="${fx(l.price)}" inputmode="decimal" enterkeyhint="next">${it&&taxLbl(d,l)?`<div class="small muted" style="white-space:nowrap">${taxLbl(d,l)}</div>`:''}</td><td class="n ln-total" data-lbl="${t('total')}" data-lt="${i}">${fmt((+l.qty||0)*(+l.price||0))}</td>`:''}
+    ${cfg.money?`<td style="width:130px" data-lbl="${t('price')}"><input type="number" step="any" min="0" class="money" data-l="${i}:price" value="${fx(l.price)}" inputmode="decimal" enterkeyhint="next">${it&&taxLbl(d,l)?`<div class="small muted" style="white-space:nowrap">${taxLbl(d,l)}</div>`:''}</td><td class="n ln-total" data-lbl="${t('total')}" style="width:130px"><input type="number" step="any" min="0" class="money" data-l="${i}:total" data-lt="${i}" value="${fx((+l.qty||0)*(+l.price||0))}" inputmode="decimal" enterkeyhint="done" title="${t('lineTotalHint')}"></td>`:''}
     <td class="ln-del" style="width:44px"><button class="btn icon ghost" data-act="rmLine" data-i="${i}" title="${t('del')}">${ic('trash')}</button></td></tr>`}).join('');
   const cash=paidLocked(d);
   const sec=(icn,title,body,extra='')=>`<section class="card fsec acc"><div class="fsec-h"><span class="fsec-ic">${ic(icn)}</span><h3>${title}</h3>${extra}</div>${body}</section>`;
@@ -1269,7 +1276,7 @@ PAGES.doc={html(){
   </div>
   ${!d.partyId&&(type==='salesReturn'||type==='purchaseReturn')?`<div class="grid g4" style="margin-top:14px">${fld(t('ref'),`<input data-f="ref" value="${h(d.ref)}">`)}</div>`:''}
   ${type==='salesReturn'||type==='purchaseReturn'?srcPickerHtml(d):''}`)}
-  ${sec('cart',t('lines'),`<div class="isearch"><div class="isearch-box">${ic('search')}<input id="itemSearch" autocomplete="off" placeholder="${t('searchItem')}" enterkeyhint="search"></div><div class="isearch-res hidden" id="itemRes"></div></div>
+  ${sec('cart',t('lines'),`<div class="isearch"><div class="row" style="flex-wrap:nowrap;gap:8px"><div class="isearch-box" style="flex:1">${ic('search')}<input id="itemSearch" autocomplete="off" placeholder="${t('searchItem')}" enterkeyhint="search"></div>${canSee('items')?`<button type="button" class="btn primary icon" data-act="quickItem" title="${t('quickItem')}" aria-label="${t('quickItem')}">${ic('plus')}</button>`:''}</div><div class="isearch-res hidden" id="itemRes"></div></div>
   ${d.lines.length?`<div class="tbl-wrap"><table class="t lines-t"><thead><tr><th>#</th><th>${t('item')}</th><th>${t('unit')}</th><th>${t('qty')}</th>${cfg.money?`<th>${t('price')}</th><th class="n">${t('total')}</th>`:''}<th></th></tr></thead><tbody>${lines}</tbody></table></div>`
    :`<div class="empty lines-empty">${ic('search')}<div>${items.length?t('noLinesYet'):`${t('noData')} — <a data-go="itemForm" style="cursor:pointer">${t('itemForm')}</a>`}</div></div>`}`,`<span class="lines-count" id="linesCount">${d.lines.length}</span>`)}
   ${sec('wallet',cfg.money?t('totalsSec'):t('notes'),`${hasPM(type)?`<div class="paym ${S.payErr&&!d.payMethod?'err':''}" id="payBox" style="margin:0 0 16px"><div class="paym-lbl">${t('payMethod')} <span class="neg">*</span></div><div class="paym-opts ${pmList(type).length>3?'four':''}">${pmList(type).map(m=>`<button type="button" class="pm pm-${m} ${d.payMethod===m?'on':''}" data-act="setPay" data-m="${m}">${ic(PM_IC[m])}<span>${t('pm_'+m)}</span></button>`).join('')}</div>
@@ -1353,7 +1360,7 @@ const PAGE_HERO={
     stats:[s.phone?[s.phone,t('phone')]:null,s.whatsapp?[s.whatsapp,t('waShort')]:null,s.taxNo?[s.taxNo,t('taxNo')]:null,[visibleUsers().length||1,t('usersN')]],logo:s.logo?`<img class="dh-logo" src="${h(s.logo)}" alt="">`:''})},
 };
 function updateDocTotals(){paintDocHero();const d=S.draft;if(!d)return;const cfg=DOCS[d.type];const T=docTotals(d);
-  d.lines.forEach((l,i)=>{const c=$(`[data-lt="${i}"]`);if(c)c.textContent=fmt((+l.qty||0)*(+l.price||0))});
+  persistDraft();d.lines.forEach((l,i)=>{const c=$(`[data-lt="${i}"]`);if(!c)return;const v=(+l.qty||0)*(+l.price||0);if(c.tagName==='INPUT'){if(document.activeElement!==c)c.value=fx(v)}else c.textContent=fmt(v)});
   const set=(id,v)=>{const e=$('#'+id);if(e)e.textContent=v};set('tSub',fmt(T.sub));set('tTax',fmt(T.tax));set('tTotal',money(T.total));
   if(paidLocked(d)){const p=$('[data-f="paid"]');if(p)p.value=fx(T.total);set('tRem',fmt(0))}else set('tRem',fmt(T.rem));}
 async function saveDoc(print){
@@ -1374,7 +1381,7 @@ async function saveDoc(print){
   if(hasPM(type))rec.payMethod=d.payMethod;
   const T=docTotals(rec);if(paidLocked(Object.assign({type},rec)))rec.paid=T.total;if(rec.paid>T.total)rec.paid=T.total;if(rec.paid<0)rec.paid=0;
   try{await Store.save(cfg.col,rec)}catch(e){return}
-  toast(t('saved')+' — '+docNo(type,rec),'ok');S.draft=null;go('doc',type);if(print)openDoc(type,rec);
+  toast(t('saved')+' — '+docNo(type,rec),'ok');dropDraft(type);S.draft=null;go('doc',type);if(print)openDoc(type,rec);
 }
 
 /* ---- document lists / reports ---- */
@@ -1497,6 +1504,28 @@ function partyForm(kind,id,onSaved){
     const rec=Object.assign({},p,{id:p.id||uid(),name:fd.name.trim(),phone:fd.phone.trim(),address:fd.address.trim(),taxNo:fd.taxNo.trim(),opening:+fd.opening||0,notes:fd.notes.trim(),createdAt:p.createdAt||Date.now()});if(kind==='customer')rec.creditLimit=Math.max(0,+fd.creditLimit||0);
     try{await Store.save(partyCol(kind),rec)}catch(err){return}closeModal();toast(t('saved')+' — '+rec.name,'ok');if(onSaved)onSaved(rec);render()};
   setTimeout(()=>{const n=$('#pForm [name=name]');n&&n.focus()},30);
+}
+
+function quickItemForm(){
+  const sq=($('#itemSearch')||{}).value||'';const ar=/[\u0600-\u06FF]/.test(sq);
+  S.itemDraft={id:'',code:nextItemCode(),name:ar?sq.trim():'',nameEn:!ar?sq.trim():'',unit:isAr()?'حبة':'pcs',price:0,cost:0,units:[],_quick:1};const d=S.itemDraft;
+  const unitList=(isAr()?['حبة','كرتون','درزن','كيس','كيلو','غرام','لتر','علبة','باكيت']:['pcs','carton','dozen','bag','kg','g','litre','box','pack']).map(u=>`<option value="${u}">`).join('');
+  openModal(`<div class="mh"><h3>${t('quickItem')}</h3><button class="btn icon ghost" data-act="close">✕</button></div><form id="qiForm"><div class="mb"><div class="grid g2">
+   ${fld(t('nameAr'),`<input data-it="name" dir="rtl" required value="${h(d.name)}" placeholder="${isAr()?'خيار':'Cucumber'}"><div class="small tr-status" id="trStatus"></div>`,1)}
+   ${fld(t('nameEn'),`<input data-it="nameEn" dir="ltr" value="${h(d.nameEn)}" placeholder="Cucumber"><div class="small tr-status" id="trStatusEn"></div>`)}
+   ${fld(t('unit'),`<input data-it="unit" list="qiUnits" required value="${h(d.unit)}"><datalist id="qiUnits">${unitList}</datalist>`,1)}
+   ${fld(t('code'),`<input value="${h(d.code)}" readonly dir="ltr">`)}
+   ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-it="cost" inputmode="decimal" placeholder="${fx(0)}">`)}
+   ${fld(t('salePrice'),`<input type="number" step="any" min="0" class="money" data-it="price" inputmode="decimal" placeholder="${fx(0)}">`)}
+  </div><p class="small muted" style="margin:10px 0 0">${t('quickItemHint')}</p></div><div class="mf"><button type="button" class="btn" data-act="close">${t('cancel')}</button><button class="btn primary">${ic('check')}${t('quickItemSave')}</button></div></form>`);
+  $('#qiForm').onsubmit=async e=>{e.preventDefault();const q=S.itemDraft;if(!q||!q._quick)return;
+    const name=String(q.name||'').trim(),unit=String(q.unit||'').trim();if(!name||!unit)return toast(t('fillReq'),'err');
+    if(S.data.items.some(x=>x.code===q.code))q.code=nextItemCode();const st=settings();
+    const rec={id:uid(),code:q.code,name,nameEn:String(q.nameEn||'').trim(),unit,price:+q.price||0,cost:+q.cost||0,units:[],minQty:0,openingQty:0,notes:'',taxable:st.itemTaxable!==false,taxRate:+st.taxRate||0,taxIncl:false,createdAt:Date.now()};
+    const btn=e.target.querySelector('.btn.primary');btn.disabled=true;
+    try{await Store.save('items',rec)}catch(err){btn.disabled=false;return}
+    S.itemDraft=null;closeModal();toast(t('saved')+' — '+name,'ok');const si=$('#itemSearch');if(si)si.value='';addItemToDraft(rec.id)};
+  setTimeout(()=>{const n=$('#qiForm [data-it=name]');n&&n.focus()},30);
 }
 
 /* ---- balances ---- */
@@ -1982,6 +2011,7 @@ const ACT={
   close(){closeModal()},
   addLine(){S.draft.lines.push({itemId:'',unit:'',factor:1,qty:1,price:0});render();const sel=$$('[data-l$=":itemId"]').pop();sel&&sel.focus()},
   rmLine(el){S.draft.lines.splice(+el.dataset.i,1);render()},
+  quickItem(){quickItemForm()},
   payFull(){const T=docTotals(S.draft);S.draft.paid=T.total;const p=$('[data-f="paid"]');if(p)p.value=fx(T.total);updateDocTotals()},
   saveDoc(el){saveDoc(!!el.dataset.print)},
   openDoc(el){const type=el.dataset.type;const d=byId(DOCS[type].col,el.dataset.id);if(d)openDoc(type,d)},
@@ -2050,7 +2080,8 @@ document.addEventListener('input',e=>{
   if(ds.f&&S.draft){if(ds.f==='partyId')return;S.draft[ds.f]=el.value;S.dirty=true;updateDocTotals();return}
   if(ds.it&&S.itemDraft){if(el.type==='checkbox'){S.itemDraft[ds.it]=el.checked;render();return}S.itemDraft[ds.it]=el.value;S.dirty=true;paintItemPreview();if(ds.it==='name'||ds.it==='nameEn')scheduleTranslate(ds.it);if(ds.it==='unit')$$('.inp-suf em').forEach(e=>{if(!/%/.test(e.textContent))e.textContent=el.value});return}
   if(ds.iu&&S.itemDraft){const [i,f]=ds.iu.split(':');S.itemDraft.units[+i][f]=el.value;S.dirty=true;paintItemPreview();return}
-  if(ds.l&&S.draft){const [i,f]=ds.l.split(':');if(f==='itemId'||f==='unit')return;S.draft.lines[+i][f]=el.value;S.dirty=true;updateDocTotals();return}
+  if(ds.l&&S.draft){const [i,f]=ds.l.split(':');if(f==='itemId'||f==='unit')return;const ln=S.draft.lines[+i];if(!ln)return;
+    if(f==='total'){const q=+ln.qty||0;if(q>0&&el.value!==''){ln.price=+((+el.value||0)/q).toFixed(6);const pi=$(`[data-l="${i}:price"]`);if(pi)pi.value=fx(ln.price)}}else ln[f]=el.value;S.dirty=true;updateDocTotals();return}
   if(ds.v&&S.vdraft){if(ds.v==='partyType'||ds.v==='partyId')return;S.vdraft[ds.v]=el.value;S.dirty=true;return}
   if(ds.c&&S.count){S.count[ds.c]=el.value;S.dirty=true;return}
   if(ds.ca&&S.count){S.count.actual[ds.ca]=el.value;S.dirty=true;const st=stockMap();const df=el.value===''?0:(+el.value-st[ds.ca]);const c=$(`[data-cd="${ds.ca}"]`);if(c)c.innerHTML=`<b class="${df>0?'pos':df<0?'neg':''}">${df?fq(df):'—'}</b>`;return}
