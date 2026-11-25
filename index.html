@@ -1543,11 +1543,11 @@ function partyForm(kind,id,onSaved){
 }
 
 function unitTileHtml(d,u,i){return `<div class="utile"><div class="utile-h"><span class="utag">${t('unitName')} ${i+2}</span><button type="button" class="btn icon ghost sm" data-act="rmUnit" data-i="${i}" title="${t('del')}">${ic('trash')}</button></div>
-    <div class="ugrid">${fld(t('unitName'),`<input data-iu="${i}:name" list="unitsDl" value="${h(u.name)}" placeholder="${isAr()?'كرتون':'carton'}">`)}
+    <div class="ugrid"><div style="grid-column:1/-1">${fld(t('unitBarcode'),`<div class="row" style="flex-wrap:nowrap;gap:8px"><input data-iu="${i}:barcode" dir="ltr" inputmode="numeric" autocomplete="off" value="${h(u.barcode||'')}" style="flex:1;letter-spacing:1px"><button type="button" class="btn icon" data-act="newUnitCode" data-i="${i}" title="${t('newCode')}">↻</button></div>`)}</div>
+    ${fld(t('unitName'),`<input data-iu="${i}:name" list="unitsDl" value="${h(u.name)}" placeholder="${isAr()?'كرتون':'carton'}">`)}
     ${fld(t('factor'),`<div class="inp-suf"><input type="number" step="any" min="0" data-iu="${i}:factor" value="${h(u.factor)}" placeholder="12"><em>${h(d.unit)}</em></div>`)}
     ${fld(t('salePrice'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:price" value="${u.price===''?'':fx(u.price)}" placeholder="${fx(0)}">`)}
-    ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:cost" value="${u.cost===''?'':fx(u.cost)}" placeholder="${fx(0)}">`)}
-    <div style="grid-column:1/-1">${fld(t('unitBarcode'),`<div class="row" style="flex-wrap:nowrap;gap:8px"><input data-iu="${i}:barcode" dir="ltr" inputmode="numeric" autocomplete="off" value="${h(u.barcode||'')}" style="flex:1;letter-spacing:1px"><button type="button" class="btn icon" data-act="newUnitCode" data-i="${i}" title="${t('newCode')}">↻</button></div>`)}</div></div></div>`}
+    ${fld(t('cost'),`<input type="number" step="any" min="0" class="money" data-iu="${i}:cost" value="${u.cost===''?'':fx(u.cost)}" placeholder="${fx(0)}">`)}</div></div>`}
 const qiUnitsHtml=()=>{const d=S.itemDraft;return d?d.units.map((u,i)=>unitTileHtml(d,u,i)).join('')+`<button type="button" class="add-tile" data-act="addUnit">${ic('plus')}<span>${t('addUnit')}</span></button>`:''};
 function quickItemForm(){
   const sq=($('#itemSearch')||{}).value||'';const ar=/[\u0600-\u06FF]/.test(sq);
