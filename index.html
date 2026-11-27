@@ -166,7 +166,7 @@ input.tr-flash{background:var(--gold-3)!important;transition:background .8s}
 .ss-list{display:none;position:absolute;inset-inline:0;top:calc(100% + 4px);z-index:60;max-height:280px;overflow:auto;background:#fff;border:1px solid var(--line,#e3e6ea);border-radius:14px;box-shadow:0 14px 34px rgba(10,20,50,.18);padding:4px}
 .ss-wrap.open .ss-list{display:block}
 .ss-it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:15px}
-.ss-it small{color:#7a8490;font-size:12px}.ss-it.act,.ss-it:hover{background:var(--pri-soft,#e8edf8)}.ss-it.on{font-weight:700}
+.ss-it small{color:#7a8490;font-size:12px}.ss-nm{display:flex;flex-direction:column;gap:1px;min-width:0}.ss-bal{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;white-space:nowrap}.ss-bal b{font-size:14px}.ss-bal.neg b{color:#c0392b}.ss-bal.pos b{color:#1a7f4b}.ss-it.act,.ss-it:hover{background:var(--pri-soft,#e8edf8)}.ss-it.on{font-weight:700}
 .ss-none{padding:12px;color:#7a8490;text-align:center;font-size:14px}
 .rs{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap}
 .rs-none{background:#eef0f3;color:#5b6472}.rs-part{background:#fff1e0;color:#c25e00}.rs-full{background:#e3f6ea;color:#1a7f4b}
@@ -1964,6 +1964,7 @@ function expReport(){const f=getF('exp',{cat:''});const L=expenseRows(f).filter(
 /* ===================== searchable selects ===================== */
 const normAr=x=>String(x||'').toLowerCase().replace(/[ً-ْـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
 function markNeed(sel){if(!sel)return;ssScan();const w=sel.closest('.ss-wrap');const tgt=w?w.querySelector('.ss-in'):sel;tgt.classList.add('need');tgt.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>tgt.focus(),250)}
+function partyKind(id){return (S.data.customers||[]).some(x=>x.id===id)?'customer':(S.data.suppliers||[]).some(x=>x.id===id)?'supplier':''}
 function partyPhone(id){const p=(S.data.customers||[]).find(x=>x.id===id)||(S.data.suppliers||[]).find(x=>x.id===id);return p?(p.phone||''):''}
 function enhanceSelect(sel){
   if(sel.dataset.ssDone)return;sel.dataset.ssDone='1';
@@ -1971,10 +1972,10 @@ function enhanceSelect(sel){
   const inp=document.createElement('input');inp.type='text';inp.className='ss-in';inp.autocomplete='off';inp.setAttribute('enterkeyhint','search');inp.placeholder=t('searchPartyPh');
   const list=document.createElement('div');list.className='ss-list';w.appendChild(inp);w.appendChild(list);
   const cur=()=>{const o=sel.options[sel.selectedIndex];return o?o.text:''};
-  inp.value=cur();let items=[],act=0;
+  inp.value=cur();let items=[],act=0,balC={};const balOfId=id=>{if(!(id in balC)){const k=partyKind(id);balC[id]=k?partyBalance(k,id):null}return balC[id]};
   const paint=q=>{const nq=normAr(q);items=[...sel.options].filter(o=>{if(!nq)return true;const ph=o.value?partyPhone(o.value):'';return normAr(o.text).includes(nq)||(ph&&ph.replace(/\D/g,'').includes(nq.replace(/\D/g,'')||'§'))});act=0;
-    list.innerHTML=items.length?items.slice(0,80).map((o,i)=>{const ph=o.value?partyPhone(o.value):'';return `<div class="ss-it${o.value===sel.value?' on':''}${i===act?' act':''}" data-i="${i}"><span>${h(o.text)}</span>${ph?`<small dir="ltr">${h(ph)}</small>`:''}</div>`}).join(''):`<div class="ss-none">${t('noResults')}</div>`};
-  const open=()=>{w.classList.add('open');paint(inp.value===cur()?'':inp.value)};
+    list.innerHTML=items.length?items.slice(0,80).map((o,i)=>{const ph=o.value?partyPhone(o.value):'';const b=o.value?balOfId(o.value):null;return `<div class="ss-it${o.value===sel.value?' on':''}${i===act?' act':''}" data-i="${i}"><span class="ss-nm"><span>${h(o.text)}</span>${ph?`<small dir="ltr">${h(ph)}</small>`:''}</span>${b!==null?`<span class="ss-bal ${b>0.0005?'neg':b<-0.0005?'pos':'muted'}"><small>${t('balance')}</small><b>${fmt(b)}</b></span>`:''}</div>`}).join(''):`<div class="ss-none">${t('noResults')}</div>`};
+  const open=()=>{balC={};w.classList.add('open');paint(inp.value===cur()?'':inp.value)};
   const close=()=>{w.classList.remove('open');inp.value=cur()};
   const pick=o=>{if(!o)return;inp.classList.remove('need');sel.classList.remove('need');const changed=sel.value!==o.value;sel.value=o.value;inp.value=o.text;w.classList.remove('open');inp.blur();if(changed)sel.dispatchEvent(new Event('change',{bubbles:true}))};
   inp.addEventListener('focus',()=>{inp.select();open()});
